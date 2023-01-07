@@ -34,7 +34,7 @@ async def save_posts(client: aiotieba.Client, tid: int, total_pages: int) -> Non
             break
         page_number += 1
 
-    aiotieba.LOG.debug(f'saved {tid}.json')
+    aiotieba.LOG.debug(f'saved post contents to {tid}.json.')
     save_file(tid, texts)
 
 
@@ -58,9 +58,11 @@ async def save_pages(name: str, page_start: int, page_end: int = -1) -> None:
 
     async with aiotieba.Client('default') as client:
         for page in range(page_start, page_end + 1):
-            aiotieba.LOG.debug(f'saving page {page}')
+            aiotieba.LOG.debug(f'saving page {page}.')
             await save_page(client, name, page)
 
+
+def merge_posts():
     # Merge all posts.
     with DATASET_FILE.open('w', encoding='utf8') as f:
         dataset = list({
@@ -69,7 +71,11 @@ async def save_pages(name: str, page_start: int, page_end: int = -1) -> None:
             for item in ujson.loads(file.read_text('utf8')) if item.strip() != ''
         })
         ujson.dump(dataset, f, ensure_ascii=False)
+    aiotieba.LOG.info('merged all posts.')
 
 
 if __name__ == '__main__':
-    asyncio.run(save_pages('复制粘贴', 1))
+    try:
+        asyncio.run(save_pages('复制粘贴', 1))
+    finally:
+        merge_posts()

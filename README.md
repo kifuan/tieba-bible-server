@@ -1,6 +1,8 @@
 # 贴吧帖子爬取和内容服务端
 
-基于[aiotieba](https://github.com/Starry-OvO/aiotieba)，你可以爬取贴吧帖子，并开启一个服务端，用来随机获取这些帖子的内容。
+你可以爬取贴吧的帖子，并开启一个服务端，用来随机获取这些帖子的内容。
+
+由于是基于 `Web API` 的交互，所以你可以很方便的将其与你的其它 `App` 进行集成，如 `nonebot` 或 `koishi` 机器人。
 
 ## 版本
 
@@ -39,6 +41,12 @@
    "server": {
        // 端口，仅当使用 `python server.py` 时会使用此端口。
        "port": 8003,
+       // 用户文本的最大长度。   
+       "custom_text_max_size": 200,
+       // 为了安全，推荐只允许本地 localhost 访问，参考 https://fastapi.tiangolo.com/advanced/middleware/?h=trusted#trustedhostmiddleware 进行高级配置。
+       "allowed_hosts": [
+            "localhost"
+        ],
        // 对这些关键字的文本进行缓存，提升运行效率。
        "cached_keywords": [
            "原神",

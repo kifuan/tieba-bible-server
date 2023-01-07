@@ -7,6 +7,10 @@
   },
   "server": {
     "port": 8003,
+    "allowed_hosts": [
+      "localhost"
+    ],
+    "custom_text_max_size": 200,
     "cached_keywords": [
       "原神",
       "压缩毛巾"

@@ -4,6 +4,7 @@ import uvicorn
 
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse, Response
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from pathlib import Path
 from pydantic import BaseModel
@@ -24,12 +25,15 @@ SPIDER_FILE = ROOT / 'data' / 'spider.json'
 
 class ServerConfig(BaseModel):
     port: int
+    custom_text_max_size: int
     cached_keywords: list[str]
+    allowed_hosts: list[str]
 
 
 config = ServerConfig.parse_obj(ujson.loads(CONFIG_FILE.read_text('utf8'))['server'])
 
 app = FastAPI()
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.allowed_hosts)
 
 
 class Dataset:
@@ -121,7 +125,11 @@ async def handle_text(keyword: str = ''):
 
 @app.post('/text')
 async def handle_add_custom_texts(body: BodyAddCustomTexts):
-    Dataset.get_instance().add_custom_texts(body.texts)
+    texts = body.texts
+    max_size = config.custom_text_max_size
+    if any(len(text) > max_size for text in texts):
+        return PlainTextResponse(content=f'max size of custom text is {max_size}', status_code=400)
+    Dataset.get_instance().add_custom_texts(texts)
     return Response()
 
 

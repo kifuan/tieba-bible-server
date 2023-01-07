@@ -47,11 +47,17 @@ def load_keyword_dataset(keyword: str) -> list[str]:
     return dataset
 
 
-@app.get('/')
+@app.get('/text')
 async def handle_text(keyword: str = ''):
     if dataset := load_keyword_dataset(keyword):
         return random.choice(dataset)
     return PlainTextResponse(f'No text has matched keyword {keyword}', 404)
+
+
+@app.get('/count')
+async def handle_count(keyword: str = ''):
+    return len(load_keyword_dataset(keyword))
+
 
 if __name__ == '__main__':
     uvicorn.run('__main__:app', port=PORT)

@@ -2,3 +2,4 @@ ujson
 uvicorn
 fastapi
 aiotieba
+pydantic

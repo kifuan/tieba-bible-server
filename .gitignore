@@ -1,0 +1,10 @@
+.idea
+
+# Spider data.
+data/raw/*.json
+data/dataset.json
+log
+
+# My personal data.
+sign.py
+aiotieba.toml

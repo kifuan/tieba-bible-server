@@ -8,7 +8,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from pathlib import Path
 from pydantic import BaseModel
-from typing import Optional, Iterator
+from typing import Optional, Iterator, Union
 
 
 ROOT = Path(__file__).parent
@@ -113,7 +113,7 @@ class Dataset:
 
 
 class BodyAddCustomTexts(BaseModel):
-    texts: list[str]
+    text: Union[str, list[str]]
 
 
 @app.get('/text')
@@ -125,10 +125,14 @@ async def handle_text(keyword: str = ''):
 
 @app.post('/text')
 async def handle_add_custom_texts(body: BodyAddCustomTexts):
-    texts = body.texts
+    texts = body.text
+    if isinstance(texts, str):
+        texts = [texts]
+
     max_size = config.custom_text_max_size
-    if any(len(text) > max_size for text in texts):
+    if any(len(t) > max_size for t in texts):
         return PlainTextResponse(content=f'max size of custom text is {max_size}', status_code=400)
+
     Dataset.get_instance().add_custom_texts(texts)
     return Response()
 

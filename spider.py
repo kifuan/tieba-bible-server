@@ -9,6 +9,8 @@ DATA_DIR = Path(__file__).parent / 'data'
 POSTS_DIR = DATA_DIR / 'posts'
 DATASET_FILE = DATA_DIR / 'dataset.json'
 
+MAX_POST_PAGES = 20
+
 
 def get_post_json(tid: int) -> Path:
     return POSTS_DIR / f'{tid}.json'
@@ -19,14 +21,14 @@ def save_file(tid: int, texts: list[str]) -> None:
         ujson.dump(texts, f, ensure_ascii=False)
 
 
-async def save_posts(client: aiotieba.Client, tid: int, total_pages: int) -> None:
+async def save_posts(client: aiotieba.Client, tid: int) -> None:
     if get_post_json(tid).exists():
         aiotieba.LOG.warning(f'tid {tid} exists')
         return
 
     page_number = 1
     texts = []
-    while page_number <= total_pages:
+    while page_number <= MAX_POST_PAGES:
         await asyncio.sleep(1)
         posts = await client.get_posts(tid, pn=page_number)
         texts.extend(post.contents.text for post in posts)
@@ -38,10 +40,10 @@ async def save_posts(client: aiotieba.Client, tid: int, total_pages: int) -> Non
     save_file(tid, texts)
 
 
-async def save_page(client: aiotieba.Client, name: str, page_number: int = 1, total_posts_pages: int = 20):
+async def save_page(client: aiotieba.Client, name: str, page_number: int):
     threads = await client.get_threads(name, pn=page_number)
     for thread in threads:
-        await save_posts(client, thread.tid, total_posts_pages)
+        await save_posts(client, thread.tid)
 
 
 async def save_pages(name: str, page_start: int, page_end: int = -1) -> None:

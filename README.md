@@ -1,4 +1,4 @@
-# 贴吧圣经爬取
+# 贴吧帖子爬取和内容服务端
 
 基于[aiotieba](https://github.com/Starry-OvO/aiotieba)，你可以爬取贴吧帖子，并开启一个服务端，用来随机获取这些帖子的内容。
 
@@ -18,7 +18,7 @@
 
 2. 配置 `config.json` 中 `spider` 下的内容，并运行 `spider.py`。
 
-   ```json
+   ```js
    "spider": {
        # 吧名，如复制粘贴吧。
        "forum_name": "复制粘贴",
@@ -35,7 +35,7 @@
 
 3. 当 `spider.py` 运行结束后，配置 `config.json` 中 `server` 下的内容，并运行 `server.py`。你可以使用 `uvicorn` 命令运行，也可以直接使用 `python server.py` 运行。
 
-   ```json
+   ```js
    "server": {
        # 端口，仅当使用 `python server.py` 时会使用此端口。
        "port": 8003,

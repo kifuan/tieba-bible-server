@@ -127,8 +127,14 @@ class BodyAddCustomTexts(BaseModel):
 @app.get('/text')
 async def handle_text(keyword: str = ''):
     if matches := Dataset.get_instance().get_keyword(keyword):
-        return random.choice(matches)
-    return PlainTextResponse(f'No text has matched keyword {keyword}.', 404)
+        return PlainTextResponse(
+            content=random.choice(matches)
+        )
+
+    return PlainTextResponse(
+        content=f'No text has matched keyword {keyword}.',
+        status_code=404
+    )
 
 
 @app.post('/text')
@@ -139,15 +145,20 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
 
     max_size = config.custom_text_max_size
     if any(len(t) > max_size for t in texts):
-        return PlainTextResponse(content=f'max size of custom text is {max_size}', status_code=400)
+        return PlainTextResponse(
+            content=f'max size of custom text is {max_size}',
+            status_code=400
+        )
 
     Dataset.get_instance().add_custom_texts(texts)
-    return Response()
+    return PlainTextResponse()
 
 
 @app.get('/count')
 async def handle_count(keyword: str = ''):
-    return len(Dataset.get_instance().get_keyword(keyword))
+    return PlainTextResponse(
+        content=len(Dataset.get_instance().get_keyword(keyword))
+    )
 
 
 if __name__ == '__main__':

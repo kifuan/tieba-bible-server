@@ -1,3 +1,4 @@
+import re
 import ujson
 import asyncio
 import aiotieba
@@ -10,6 +11,9 @@ POSTS_DIR = DATA_DIR / 'posts'
 DATASET_FILE = DATA_DIR / 'dataset.json'
 
 MAX_POST_PAGES = 20
+
+# The regex to remove prefix to reply.
+REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
 
 
 def get_post_json(tid: int) -> Path:
@@ -64,14 +68,19 @@ async def save_pages(name: str, page_start: int, page_end: int = -1) -> None:
             await save_page(client, name, page)
 
 
-def merge_posts():
-    # Merge all posts.
+def merge_posts() -> None:
+    """
+    Merge all posts the spider fetched in JSON files.
+    """
+
     with DATASET_FILE.open('w', encoding='utf8') as f:
-        dataset = list({
-            item.strip()
+        processed_dataset = {
+            REPLY_PREFIX_REGEX.sub('', item.strip())
             for file in POSTS_DIR.iterdir() if file.suffix == '.json'
-            for item in ujson.loads(file.read_text('utf8')) if item.strip() != ''
-        })
+            for item in ujson.loads(file.read_text('utf8'))
+        }
+        # Remove empty texts by the simple condition.
+        dataset = [text for text in processed_dataset if text]
         ujson.dump(dataset, f, ensure_ascii=False)
     aiotieba.LOG.info('merged all posts.')
 

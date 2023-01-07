@@ -61,6 +61,10 @@ class Dataset:
         if not SPIDER_FILE.exists():
             raise FileNotFoundError('spider.json not found, please run spider.py first')
 
+        if not CUSTOM_FILE.exists():
+            # The content of custom.json is just an empty array by default.
+            CUSTOM_FILE.write_text('[]', encoding='utf8')
+
         spider = ujson.loads(SPIDER_FILE.read_text('utf8'))
         custom = ujson.loads(CUSTOM_FILE.read_text('utf8'))
         return cls(spider, custom)

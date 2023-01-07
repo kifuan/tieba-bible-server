@@ -74,7 +74,7 @@
      GET /count?keyword=
      ```
    
-   + // 从含指定关键字的文本中抽取一个，不填 `keyword` 从全部文本中抽取。
+   + 从含指定关键字的文本中抽取一个，不填 `keyword` 从全部文本中抽取。
    
      ```http
      GET /text?keyword=

@@ -6,11 +6,25 @@ import aiotieba
 from pathlib import Path
 
 
-DATA_DIR = Path(__file__).parent / 'data'
+ROOT_DIR = Path(__file__).parent
+DATA_DIR = ROOT_DIR / 'data'
 POSTS_DIR = DATA_DIR / 'posts'
 DATASET_FILE = DATA_DIR / 'dataset.json'
 
-MAX_POST_PAGES = 20
+# Configurations.
+CONFIG = ujson.loads((ROOT_DIR / 'config.json').read_text('utf8'))['spider']
+
+# Max post pages it will get.
+MAX_POST_PAGES = CONFIG['max_post_pages']
+
+# The start page to fetch.
+START_PAGE = CONFIG['start_page']
+
+# The end page to fetch. It can be -1 to get single start page.
+END_PAGE = CONFIG['end_page']
+
+# The forum name to fetch.
+FORUM_NAME = CONFIG['forum_name']
 
 # The regex to remove prefix to reply.
 REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
@@ -50,20 +64,20 @@ async def save_page(client: aiotieba.Client, name: str, page_number: int):
         await save_posts(client, thread.tid)
 
 
-async def save_pages(name: str, page_start: int, page_end: int = -1) -> None:
+async def save_pages(name: str, start_page: int, end_page: int) -> None:
     """
     Saves specified pages.
-    It will only save `page_start` if `page_end` is set to -1 by default.
+    It will only save `page_start` if `page_end` is set to -1.
     :param name: the forum name.
-    :param page_start: the start page number.
-    :param page_end: the end page number.
+    :param start_page: the start page number.
+    :param end_page: the end page number.
     """
 
-    if page_end == -1:
-        page_end = page_start
+    if end_page == -1:
+        end_page = start_page
 
     async with aiotieba.Client('default') as client:
-        for page in range(page_start, page_end + 1):
+        for page in range(start_page, end_page + 1):
             aiotieba.LOG.debug(f'saving page {page}.')
             await save_page(client, name, page)
 
@@ -87,6 +101,6 @@ def merge_posts() -> None:
 
 if __name__ == '__main__':
     try:
-        asyncio.run(save_pages('复制粘贴', 1))
+        asyncio.run(save_pages(FORUM_NAME, START_PAGE, END_PAGE))
     finally:
         merge_posts()

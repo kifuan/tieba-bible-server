@@ -8,12 +8,13 @@ from fastapi.responses import PlainTextResponse
 
 from functools import cache
 
+CONFIG = ujson.loads((Path(__file__).parent / 'config.json').read_text('utf8'))['server']
 
 # Uvicorn port.
-PORT = 8003
+PORT = CONFIG['port']
 
 # Keywords to cache.
-CACHED_KEYWORDS = ['原神', '压缩毛巾']
+CACHED_KEYWORDS = CONFIG['cached_keywords']
 
 # Cached datasets. It will be updated at runtime when matches keyword in `CACHED_KEYWORDS`
 CACHED_DATASETS = {}

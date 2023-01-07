@@ -1,0 +1,15 @@
+{
+  "spider": {
+    "forum_name": "复制粘贴",
+    "start_page": 1,
+    "end_page": -1,
+    "max_post_pages": 20
+  },
+  "server": {
+    "port": 8003,
+    "cached_keywords": [
+      "原神",
+      "压缩毛巾"
+    ]
+  }
+}

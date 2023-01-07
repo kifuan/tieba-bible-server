@@ -1,8 +1,8 @@
 {
   "spider": {
     "forum_name": "复制粘贴",
-    "start_page": 30,
-    "end_page": 35,
+    "start_page": 1,
+    "end_page": 5,
     "max_post_pages": 20
   },
   "server": {

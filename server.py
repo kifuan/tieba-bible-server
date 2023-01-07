@@ -13,20 +13,24 @@ from typing import Optional, Iterator, Union
 
 ROOT = Path(__file__).parent
 
-# Configurations for the server.
 CONFIG_FILE = ROOT / 'config.json'
 
-# Custom texts file.
 CUSTOM_FILE = ROOT / 'data' / 'custom.json'
 
-# Dataset file from the spider.
 SPIDER_FILE = ROOT / 'data' / 'spider.json'
 
 
 class ServerConfig(BaseModel):
+    # Server port.
     port: int
+
+    # Max size for custom-upload texts.
     custom_text_max_size: int
+
+    # Keywords to be cached.
     cached_keywords: list[str]
+
+    # Allowed hosts for security.
     allowed_hosts: list[str]
 
 
@@ -71,7 +75,7 @@ class Dataset:
 
     def get_keyword(self, keyword: str) -> list[str]:
         """
-        Gets data filtered with specified keyword.
+        Gets data filtered by specified keyword.
         :param keyword: the keyword to filter.
         :return: filtered data.
         """
@@ -90,7 +94,7 @@ class Dataset:
 
     def add_custom_texts(self, texts: list[str]) -> None:
         """
-        Adds custom texts by the user.
+        Adds custom texts from the user.
         :param texts: the texts to add.
         """
 

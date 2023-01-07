@@ -2,13 +2,17 @@ import ujson
 import random
 import uvicorn
 
-from pathlib import Path
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 
+from pathlib import Path
 from functools import cache
 
-CONFIG = ujson.loads((Path(__file__).parent / 'config.json').read_text('utf8'))['server']
+
+ROOT = Path(__file__).parent
+
+# Configurations for the server.
+CONFIG = ujson.loads((ROOT / 'config.json').read_text('utf8'))['server']
 
 # Uvicorn port.
 PORT = CONFIG['port']
@@ -30,10 +34,10 @@ def load_dataset_file() -> list[str]:
     :return: the dataset from file.
     """
 
-    path = Path(__file__).parent / 'data' / 'dataset.json'
-    if not path.exists():
+    dataset_file = ROOT / 'data' / 'dataset.json'
+    if not dataset_file.exists():
         raise FileNotFoundError('no dataset.json, please run spider.py first.')
-    return ujson.loads(path.read_text('utf8'))
+    return ujson.loads(dataset_file.read_text('utf8'))
 
 
 def load_keyword_dataset(keyword: str) -> list[str]:

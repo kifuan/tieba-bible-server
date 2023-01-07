@@ -18,7 +18,7 @@ SPIDER_FILE = DATA_DIR / 'spider.json'
 CONFIG_FILE = ROOT_DIR / 'config.json'
 
 
-# The regex to remove prefix to reply.
+# The regex to remove reply prefix.
 REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
 
 
@@ -29,7 +29,7 @@ class SpiderConfig(BaseModel):
     # # The start page to fetch.
     start_page: int
 
-    # The end page to fetch. It can be -1 to get single start page.
+    # The end page to fetch.
     end_page: int
 
     # The forum name to fetch.
@@ -76,14 +76,10 @@ async def save_page(client: aiotieba.Client, name: str, page_number: int):
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
     """
     Saves specified pages.
-    It will only save `page_start` if `page_end` is set to -1.
     :param name: the forum name.
     :param start_page: the start page number.
     :param end_page: the end page number.
     """
-
-    if end_page == -1:
-        end_page = start_page
 
     async with aiotieba.Client('default') as client:
         for page in range(start_page, end_page + 1):
@@ -97,6 +93,7 @@ def merge_posts() -> None:
     """
 
     with SPIDER_FILE.open('w', encoding='utf8') as f:
+        # Remove reply prefixes for all texts.
         processed_dataset = {
             REPLY_PREFIX_REGEX.sub('', item.strip())
             for file in POSTS_DIR.iterdir() if file.suffix == '.json'

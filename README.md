@@ -24,14 +24,14 @@
 
    ```js
    "spider": {
-       // 吧名，如复制粘贴吧。
+       // 吧名，推荐复制粘贴吧。
        "forum_name": "复制粘贴",
-       // 从哪页开始爬取。
+       // 开始爬取页，包含这页。
        "start_page": 1,
-       // 到哪页截至。
+       // 结束爬取页，包含这页。
        "end_page": 5,
-       // 每个帖子最多爬多少页。
-       "max_post_pages": 20
+       // 每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
+       "max_post_pages": 10
    }
    ```
 
@@ -43,14 +43,14 @@
    "server": {
        // 运行端口。
        "port": 8003,
-       // 用户文本的最大长度。   
+       // 用户上传文本的最大长度，仅在 POST 请求时校验使用，与爬取的数据无关。
        "custom_text_max_size": 200,
        // 为了安全，推荐只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
        "allowed_hosts": [
             "127.0.0.1",
             "localhost"
         ],
-       // 对这些关键字的文本进行缓存，提升运行效率。
+       // 对这些关键字的查询结果进行缓存，提升运行效率。
        "cached_keywords": [
            "原神",
            "压缩毛巾"

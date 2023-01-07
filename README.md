@@ -43,9 +43,9 @@
        "port": 8003,
        // 用户文本的最大长度。   
        "custom_text_max_size": 200,
-       // 为了安全，推荐只允许本地 localhost 访问，参考 https://fastapi.tiangolo.com/advanced/middleware/?h=trusted#trustedhostmiddleware 进行高级配置。
-       "allowed_hosts": [
-            "localhost"
+       // 为了安全，推荐只允许本地 127.0.0.1 访问，参考 https://github.com/encode/uvicorn/blob/master/uvicorn/middleware/proxy_headers.py 进行配置。
+       "trusted_hosts": [
+            "127.0.0.1"
         ],
        // 对这些关键字的文本进行缓存，提升运行效率。
        "cached_keywords": [

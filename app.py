@@ -22,15 +22,27 @@ app = FastAPI()
 
 
 @cache
-def load_dataset() -> list[str]:
+def load_dataset_file() -> list[str]:
+    """
+    Loads dataset from file.
+    The result will be cached, so it's ok to call it multiple times.
+    :return: the dataset from file.
+    """
+
     path = Path(__file__).parent / 'data' / 'dataset.json'
     if not path.exists():
-        raise FileNotFoundError('no dataset.json, please run merge.py first.')
+        raise FileNotFoundError('no dataset.json, please run spider.py first.')
     return ujson.loads(path.read_text('utf8'))
 
 
 def load_keyword_dataset(keyword: str) -> list[str]:
-    dataset = load_dataset()
+    """
+    Loads dataset for specified keyword.
+    :param keyword: the keyword to load dataset.
+    :return: the dataset for specified keyword.
+    """
+
+    dataset = load_dataset_file()
 
     if not keyword:
         return dataset
@@ -49,6 +61,11 @@ def load_keyword_dataset(keyword: str) -> list[str]:
 
 @app.get('/text')
 async def handle_text(keyword: str = ''):
+    """
+    Gets specified text.
+    :param keyword:
+    :return:
+    """
     if dataset := load_keyword_dataset(keyword):
         return random.choice(dataset)
     return PlainTextResponse(f'No text has matched keyword {keyword}', 404)
@@ -56,6 +73,11 @@ async def handle_text(keyword: str = ''):
 
 @app.get('/count')
 async def handle_count(keyword: str = ''):
+    """
+    Gets count for specified keyword.
+    :param keyword: the keyword to count.
+    :return: the count of specified keyword in the dataset.
+    """
     return len(load_keyword_dataset(keyword))
 
 

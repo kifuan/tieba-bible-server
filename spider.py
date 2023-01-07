@@ -29,7 +29,7 @@ async def save_posts(client: aiotieba.Client, tid: int, total_pages: int) -> Non
     while page_number <= total_pages:
         await asyncio.sleep(1)
         posts = await client.get_posts(tid, pn=page_number)
-        texts.extend(post.text for post in posts)
+        texts.extend(post.contents.text for post in posts)
         if not posts.has_more:
             break
         page_number += 1

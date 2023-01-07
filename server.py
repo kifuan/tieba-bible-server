@@ -3,7 +3,7 @@ import random
 import uvicorn
 
 from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse, Response
+from fastapi.responses import PlainTextResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from pathlib import Path

@@ -62,32 +62,45 @@
    python server.py
    ```
 
-   关于如何使用 `uvicorn` 部署，请参考它们的[文档](http://www.uvicorn.org/deployment/)。
+   关于如何使用 `uvicorn` 部署，请参考它的[文档](http://www.uvicorn.org/deployment/)了解。
+
+   此外，你还可以用 `pm2` 等工具来部署，请参考它的[文档](https://pm2.keymetrics.io/docs/usage/quick-start/)进行了解。
 
 4. 有下列 `API` 可供调用，参数 `keyword` 可以留空。
 
-   ``` http
-   // 获取指定关键字下的文本数量，不填 keyword 获取所有文本的数量。
-   GET /count?keyword=
+   + 获取指定关键字下的文本数量，不填 `keyword` 获取所有文本的数量。
    
-   // 从含指定关键字的文本中抽取一个，不填 keyword 从全部文本中抽取。
-   GET /text?keyword=
+     ```http
+     GET /count?keyword=
+     ```
    
-   // 手动添加文本。
-   POST /text
-   {
-   	"text": "foo"
-   }
+   + // 从含指定关键字的文本中抽取一个，不填 `keyword` 从全部文本中抽取。
    
-   // 你也可以传一个数组，注意，如果任意一个字符超过最大要求，本次请求的所有数据都不会被添加。
-   POST /text
-   {
-       "text": [
-           "foo",
-           "bar"
-       ]
-   }
-   ```
+     ```http
+     GET /text?keyword=
+     ```
+   
+   + 添加自定义文本。
+   
+     ```http
+     POST /text
+     {
+     	"text": "foo"
+     }
+     ```
+   
+   + 你也可以传一个数组，注意，如果**任意一个字符串**超过最大要求，本次请求的**所有数据都不会被添加**。
+   
+     ```http
+     POST /text
+     {
+         "text": [
+             "foo",
+             "bar"
+         ]
+     }
+     ```
+   
 
 ## 协议
 

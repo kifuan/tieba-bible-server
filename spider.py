@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).parent
 DATA_DIR = ROOT_DIR / 'data'
 POSTS_DIR = DATA_DIR / 'posts'
-DATASET_FILE = DATA_DIR / 'dataset.json'
+SPIDER_FILE = DATA_DIR / 'spider.json'
 
 # Configurations.
 CONFIG = ujson.loads((ROOT_DIR / 'config.json').read_text('utf8'))['spider']
@@ -87,7 +87,7 @@ def merge_posts() -> None:
     Merge all posts the spider fetched in JSON files.
     """
 
-    with DATASET_FILE.open('w', encoding='utf8') as f:
+    with SPIDER_FILE.open('w', encoding='utf8') as f:
         processed_dataset = {
             REPLY_PREFIX_REGEX.sub('', item.strip())
             for file in POSTS_DIR.iterdir() if file.suffix == '.json'

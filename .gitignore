@@ -2,7 +2,7 @@
 
 # Spider data.
 data/raw/*.json
-data/dataset.json
+data/spider.json
 log
 
 # My personal data.

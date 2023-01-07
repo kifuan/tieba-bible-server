@@ -156,8 +156,9 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
 
 @app.get('/count')
 async def handle_count(keyword: str = ''):
+    data = Dataset.get_instance().get_keyword(keyword)
     return PlainTextResponse(
-        content=len(Dataset.get_instance().get_keyword(keyword))
+        content=str(len(data))
     )
 
 

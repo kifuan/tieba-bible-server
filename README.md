@@ -43,9 +43,10 @@
        "port": 8003,
        // 用户文本的最大长度。   
        "custom_text_max_size": 200,
-       // 为了安全，推荐只允许本地 127.0.0.1 访问，参考 https://github.com/encode/uvicorn/blob/master/uvicorn/middleware/proxy_headers.py 进行配置。
-       "trusted_hosts": [
-            "127.0.0.1"
+       // 为了安全，推荐只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
+       "allowed_hosts": [
+            "127.0.0.1",
+            "localhost"
         ],
        // 对这些关键字的文本进行缓存，提升运行效率。
        "cached_keywords": [
@@ -54,6 +55,7 @@
        ]
    }
    ```
+   其实我也知道 `allowed_hosts` 仅通过修改 `HEADERS` 就能轻松绕过，仅仅是聊胜于无罢了。
 
    配置完后运行 `server.py`。你可以使用 `uvicorn` 命令运行，也可以直接使用 `python server.py` 运行。
 

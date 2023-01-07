@@ -7,8 +7,9 @@
   },
   "server": {
     "port": 8003,
-    "trusted_hosts": [
-      "127.0.0.1"
+    "allowed_hosts": [
+      "127.0.0.1",
+      "localhost"
     ],
     "custom_text_max_size": 200,
     "cached_keywords": [

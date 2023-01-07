@@ -2,10 +2,9 @@ import ujson
 import random
 import uvicorn
 
-from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
-
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse, Response
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from pathlib import Path
 from pydantic import BaseModel
@@ -28,13 +27,13 @@ class ServerConfig(BaseModel):
     port: int
     custom_text_max_size: int
     cached_keywords: list[str]
-    trusted_hosts: list[str]
+    allowed_hosts: list[str]
 
 
 config = ServerConfig.parse_obj(ujson.loads(CONFIG_FILE.read_text('utf8'))['server'])
 
 app = FastAPI()
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=config.trusted_hosts)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.allowed_hosts)
 
 
 class Dataset:
@@ -144,4 +143,4 @@ async def handle_count(keyword: str = ''):
 
 
 if __name__ == '__main__':
-    uvicorn.run('__main__:app', port=config.port)
+    uvicorn.run('__main__:app', port=config.port, host='0.0.0.0')

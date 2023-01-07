@@ -1,2 +1,2 @@
-Spider data will be put in this directory.
+The spider will put data in this directory.
 爬虫获取的数据会放到这个文件夹下。

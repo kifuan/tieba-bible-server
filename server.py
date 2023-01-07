@@ -126,13 +126,13 @@ class BodyAddCustomTexts(BaseModel):
 
 @app.get('/text')
 async def handle_text(keyword: str = ''):
-    if matches := Dataset.get_instance().get_keyword(keyword):
+    if texts := Dataset.get_instance().get_keyword(keyword):
         return PlainTextResponse(
-            content=random.choice(matches)
+            content=random.choice(texts)
         )
 
     return PlainTextResponse(
-        content=f'No text has matched keyword {keyword}.',
+        content=f'No text matched specified keyword {keyword}.',
         status_code=404
     )
 

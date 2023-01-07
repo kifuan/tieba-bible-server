@@ -13,7 +13,7 @@ from typing import Optional, Iterator
 ROOT = Path(__file__).parent
 
 # Configurations for the server.
-CONFIG = ujson.loads((ROOT / 'config.json').read_text('utf8'))['server']
+CONFIG_FILE = ROOT / 'config.json'
 
 # Custom texts file.
 CUSTOM_FILE = ROOT / 'data' / 'custom.json'
@@ -21,11 +21,13 @@ CUSTOM_FILE = ROOT / 'data' / 'custom.json'
 # Dataset file from the spider.
 SPIDER_FILE = ROOT / 'data' / 'spider.json'
 
-# Uvicorn port.
-PORT = CONFIG['port']
 
-# Keywords to cache.
-CACHED_KEYWORDS = CONFIG['cached_keywords']
+class ServerConfig(BaseModel):
+    port: int
+    cached_keywords: list[str]
+
+
+config = ServerConfig.parse_obj(ujson.loads(CONFIG_FILE.read_text('utf8'))['server'])
 
 app = FastAPI()
 
@@ -73,8 +75,7 @@ class Dataset:
         result = [text for text in self if keyword in text]
 
         # Cache the keyword if specified.
-        if keyword in CACHED_KEYWORDS:
-            print(f'cached keyword {keyword}')
+        if keyword in config.cached_keywords:
             self._caches[keyword] = result
 
         return result
@@ -130,4 +131,4 @@ async def handle_count(keyword: str = ''):
 
 
 if __name__ == '__main__':
-    uvicorn.run('__main__:app', port=PORT)
+    uvicorn.run('__main__:app', port=config.port)

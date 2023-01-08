@@ -104,7 +104,7 @@
 
 如果数据很多，运行效率较慢，因为 `jieba.cut` 需要时间，请耐心等待。
 
-以下为 `config.json` 的 `analyzer` 配置下每个配置项的解析：
+以下为 `config.json` 的 `analyzer` 配置下每个配置项的解释：
 
 + `limit`：默认为 `30`，表示显示排名前多少的词。
 + `font_name`：默认为 `Microsoft YaHei`，传给 `matplotlib` 的字体来避免中文乱码。如果你是 `MacOS` 请考虑设置它为 `PingFang SC` 或其它中文字体。

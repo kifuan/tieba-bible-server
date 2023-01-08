@@ -50,9 +50,9 @@ class Dataset:
 
     def get_random_text(self, keyword: str) -> Optional[str]:
         """
-        Gets a random text which contains the specified keyword.
+        Gets a random text which contains the keyword.
         :param keyword: the keyword to filter.
-        :return: the random text.
+        :return: the random text, it will be None if no text contains the keyword.
         """
 
         with self._conn:

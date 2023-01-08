@@ -42,7 +42,7 @@ async def handle_text(keyword: str = ''):
         return text
 
     return JSONResponse(
-        content=f'no text has matched given keyword {keyword}',
+        content=f'no text contains given keyword {keyword}',
         status_code=404
     )
 

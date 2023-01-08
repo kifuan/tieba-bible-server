@@ -3,6 +3,7 @@ import ujson
 import asyncio
 import aiotieba
 
+from typing import AsyncIterator
 from pathlib import Path
 
 from config import config
@@ -24,34 +25,43 @@ def get_post_json(tid: int) -> Path:
     return POSTS_DIR / f'{tid}.json'
 
 
-def save_file(tid: int, texts: list[str]) -> None:
+async def save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
+    """
+    Saves posts in tid.json and returns the list of texts.
+    :param tid: the thread id.
+    :param texts: the async generator of texts.
+    """
+
+    list_texts = [text async for text in texts]
     with open(get_post_json(tid), 'w', encoding='utf8') as f:
-        ujson.dump(texts, f, ensure_ascii=False)
+        ujson.dump(list_texts, f, ensure_ascii=False)
+    return list_texts
 
 
-async def save_posts(client: aiotieba.Client, tid: int) -> None:
+async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str, None]:
     if get_post_json(tid).exists():
         aiotieba.LOG.warning(f'The tid {tid} exists.')
         return
 
     page_number = 1
-    texts = []
     while page_number <= config.spider.max_post_pages:
         await asyncio.sleep(1)
         posts = await client.get_posts(tid, pn=page_number)
-        texts.extend(post.contents.text for post in posts)
+        for post in posts:
+            yield post.contents.text
         if not posts.has_more:
             break
         page_number += 1
 
     aiotieba.LOG.debug(f'Saved post contents to {tid}.json.')
-    save_file(tid, texts)
 
 
 async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:
+    dataset = Dataset.get_instance()
     threads = await client.get_threads(name, pn=page_number, sort=1)
     for thread in threads:
-        await save_posts(client, thread.tid)
+        texts = await save_posts(thread.tid, get_posts(client, thread.tid))
+        dataset.add_texts(texts)
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -81,20 +91,14 @@ def merge_posts() -> None:
     }
     # Remove empty texts by the simple condition.
     len1 = len(dataset)
-    dataset.add_texts((text, ) for text in processed_dataset if text)
+    dataset.add_texts(text for text in processed_dataset if text)
     aiotieba.LOG.info(f'Added {len(dataset) - len1} texts.')
     dataset.close_dataset()
 
 
-async def start_spider(merge_only: bool = False):
-    # The merge_only parameter is used for debugging.
-    try:
-        if not merge_only:
-            await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
-    finally:
-        merge_posts()
-
-
 if __name__ == '__main__':
-    asyncio.run(start_spider())
+    asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
+
+    # Close the dataset when the program exits.
+    Dataset.get_instance().close_dataset()
 

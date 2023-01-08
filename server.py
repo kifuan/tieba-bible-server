@@ -11,8 +11,6 @@ from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional, Iterator, Union
 
-from spider import start_spider
-
 
 ROOT = Path(__file__).parent
 
@@ -170,32 +168,10 @@ async def handle_count(keyword: str = ''):
     return len(Dataset.get_instance().get_keyword(keyword))
 
 
-def spider_done_callback(_):
-    global spider_task
-
+@app.post('/reload')
+async def handle_reload():
     Dataset.get_instance().reload_spider_data()
-    spider_task = None
-
-
-@app.get('/spider')
-async def handle_get_spider_status():
-    return spider_task is not None
-
-
-@app.post('/spider')
-async def handle_start_spider():
-    global spider_task
-
-    if spider_task is not None:
-        return JSONResponse(
-            content='the spider has already been running',
-            status_code=400
-        )
-
-    spider_task = asyncio.create_task(start_spider())
-    spider_task.add_done_callback(spider_done_callback)
-
-    return 'started spider successfully'
+    return True
 
 
 if __name__ == '__main__':

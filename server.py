@@ -1,9 +1,9 @@
 import ujson
 import random
 import uvicorn
+import logging
 
 from fastapi import FastAPI
-from fastapi.logger import logger
 from fastapi.responses import JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
@@ -23,6 +23,9 @@ SPIDER_FILE = DATA_DIR / 'spider.json'
 
 app = FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.server.allowed_hosts)
+
+# Use uvicorn logger.
+logger = logging.getLogger('uvicorn')
 
 
 class Dataset:
@@ -48,7 +51,7 @@ class Dataset:
             return cls._instance
 
         if not SPIDER_FILE.exists():
-            logger.warning('you have not run spider.py yet, please run it when the server is running')
+            logger.warning('You have not run spider.py yet, please run it when the server is running')
             SPIDER_FILE.write_text('[]', encoding='utf8')
 
         if not CUSTOM_FILE.exists():

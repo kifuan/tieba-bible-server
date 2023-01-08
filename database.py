@@ -80,16 +80,18 @@ class Database:
             for row in cursor.fetchall():
                 yield row[0]
 
-    def add_texts(self, texts: Iterable[str]) -> None:
+    def add_texts(self, texts: Iterable[str]) -> int:
         """
         Adds multiple texts to the database.
         :param texts: texts to add.
+        :return: the count of affected lines.
         """
 
         with self._conn:
             cursor = self._conn.cursor()
             # The executemany needs a generator of tuples.
             cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', ((text, ) for text in texts))
+            return cursor.rowcount
 
     def count_keyword(self, keyword: str = '') -> int:
         """

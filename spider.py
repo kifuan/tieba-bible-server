@@ -93,7 +93,8 @@ async def save_page(client: aiotieba.Client, name: str, page_number: int) -> Non
     threads = await client.get_threads(name, pn=page_number, sort=1)
     for thread in threads:
         texts = await get_and_save_thread(thread.tid, get_threads(client, thread.tid))
-        database.add_texts(texts)
+        affected_lines = database.add_texts(texts)
+        aiotieba.LOG.info(f'Added {affected_lines} texts.')
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -116,15 +117,12 @@ def merge_threads() -> None:
 
     database = Database.get_instance()
     aiotieba.LOG.info('Reading files.')
-    # Remove empty texts by the simple condition.
-    len1 = database.count_keyword()
-    database.add_texts({
+    affected_lines = database.add_texts({
         process_text(text)
         for file in THREADS_DIR.iterdir() if file.suffix == '.json'
         for text in ujson.loads(file.read_text('utf8'))
     })
-    len2 = database.count_keyword()
-    aiotieba.LOG.info(f'Added {len2 - len1} texts.')
+    aiotieba.LOG.info(f'Added {affected_lines} texts.')
 
 
 async def main():

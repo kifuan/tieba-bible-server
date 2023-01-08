@@ -98,7 +98,7 @@
          "text": "foo"
      }
      
-   POST /text
+     POST /text
      {
        "text": [
              "foo",

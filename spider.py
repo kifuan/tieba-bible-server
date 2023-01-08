@@ -113,9 +113,11 @@ async def refresh_server_if_configured() -> None:
     aiotieba.LOG.info(f'added {added_len} texts.')
 
 
-async def start_spider():
+async def start_spider(merge_only: bool = False):
+    # The merge_only parameter is used for debugging.
     try:
-        await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
+        if not merge_only:
+            await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
     finally:
         merge_posts()
         await refresh_server_if_configured()

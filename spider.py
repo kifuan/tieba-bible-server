@@ -34,7 +34,7 @@ def save_file(tid: int, texts: list[str]) -> None:
 
 async def save_posts(client: aiotieba.Client, tid: int) -> None:
     if get_post_json(tid).exists():
-        aiotieba.LOG.warning(f'tid {tid} exists')
+        aiotieba.LOG.warning(f'tid {tid} exists.')
         return
 
     page_number = 1

@@ -23,22 +23,12 @@
    ```
 
 2. 配置 `config.json` 中 `server` 下的内容之后开启服务端，每项解释如下。
+   
+   + `port`：默认 `8003`，表示运行端口。
+   + `custom_text_max_length`：默认 `200`，表示用户上传文本的最大长度，仅在 `POST /text` 请求时校验使用，与爬取的数据无关。
+   + `host`：默认 `127.0.0.1`，表示 `uvicorn` 运行的 `host`。
+   + `allowed_hosts`：默认 `['127.0.0.1', 'localhost']`，表示允许以那些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
 
-   ```js
-   "server": {
-       // 运行端口。
-       "port": 8003,
-       // 用户上传文本的最大长度，仅在 POST 请求时校验使用，与爬取的数据无关。
-       "custom_text_max_size": 200,
-        // uvicorn 运行的 host，推荐设置为 127.0.0.1 即可。
-       "host": "127.0.0.1",
-       // 为了安全，推荐只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
-       "allowed_hosts": [
-            "127.0.0.1",
-            "localhost"
-        ]
-   }
-   ```
    其实我也知道 `allowed_hosts` 通过修改 `HEADERS` 就能被轻松绕过，仅仅是聊胜于无罢了。
 
    配置完后运行 `server.py`。你可以使用 `uvicorn` 命令运行，也可以直接使用 `python server.py` 运行。
@@ -52,32 +42,21 @@
 
    此外，你还可以用 `pm2` 等工具来部署，请参考它的[文档](https://pm2.keymetrics.io/docs/usage/quick-start/)进行了解。
 
-3. 配置 `config.json` 中 `spider` 下的内容，并运行 `spider.py`。
+3. 运行 `spider.py` 爬取数据。
 
-   注意，你要确保**服务端正在运行**，否则当爬取结束后将不能正确的重新加载服务端。
+   下面是 `config.json` 中 `spider` 下各配置项的说明：
 
-   ```js
-   "spider": {
-       // 吧名，推荐复制粘贴吧。
-       "forum_name": "复制粘贴",
-       // 开始爬取页，包含这页。
-       "start_page": 1,
-       // 结束爬取页，包含这页。
-       "end_page": 5,
-       // 每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
-       "max_post_pages": 10,
-       // 是否只合并本地爬取到的文件，如果是 true 则不会爬取新的帖子，只会合并本地数据，是作者拿来 debug 用的。
-       "merge_only": false
-   }
-   ```
+   + `forum_name`：默认为 `复制粘贴`，表示吧名，推荐使用默认的复制粘贴吧。
+   + `start_page`：默认为 `1`，表示从哪页开始爬取，包含这页。
+   + `end_page`：默认为 `5`，表示从哪页结束，包含这页。
+   + `max_post_pages`：默认为 `10`，表示每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
+   + `merge_only`：默认为 `false`，表示是否只合并本地爬取到的文件，如果是 `true` 则不会爬取新的帖子，只会合并本地数据，是作者拿来 debug 用的。
 
    首次运行会产生 `aiotieba.toml`，请参考他们的[官方文档](https://v-8.top/tutorial/quickstart/#_4)来进行配置 `aiotieba.toml`。
 
    不过如果你只是需要爬取数据，这应该是**不需要你配置**的，你可以不管它。
 
-4. 如果 `spider.py` 还没运行结束，先不要访问 `API`，因为没有数据。
-
-   有下列 `API` 可供调用，所有 `API` 返回的都是 `application/json` 类型的数据。
+4. 有下列 `API` 可供调用，所有 `API` 返回的都是 `application/json` 类型的数据。
 
    为了**简化返回数据**，此项目并没有按照传统的方式返回一个 `{success: boolean, message: string, data: any}`，而是以 `HTTP` 状态码的形式说明运行成功与否，这样方便你直接用 `response.json()` 来获取 `API` 的返回结果。
 
@@ -123,9 +102,13 @@
 
 注意，它只会分析中英文和数字，忽略其它各种各样的语言。 在爬取到数据后直接运行 `analyze.py` 即可，无需额外配置。
 
-当然你可以修改这个脚本里面的全局变量 `LIMIT` 和 `FONT` 还有 `MIN_WORD_LEN` 来决定显示排名前几的词，字体和统计词的最短长度。
-
 如果数据很多，运行效率较慢，因为 `jieba.cut` 需要时间，请耐心等待。
+
+你也可以在 `config.json` 中配置这个脚本，以下为每个配置项的解析：
+
++ `limit`：显示排名前多少的词，默认为 `30`。
++ `font_name`：传给 `matplotlib` 的字体，默认为 `Microsoft YaHei` 来避免中文乱码。如果你是 `MacOS` 请考虑设置它为 `PingFang SC` 或其它中文字体。
++ `min_word_length`：最短词长度，默认为 `2`。
 
 ## 安全
 

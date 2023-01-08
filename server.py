@@ -132,7 +132,7 @@ async def handle_text(keyword: str = ''):
         )
 
     return PlainTextResponse(
-        content=f'No text matched specified keyword {keyword}.',
+        content=f'no text has matched the specified keyword {keyword}',
         status_code=404
     )
 

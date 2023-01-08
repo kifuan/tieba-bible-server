@@ -91,7 +91,7 @@ class Database:
             # The executemany needs a generator of tuples.
             cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', ((text, ) for text in texts))
 
-    def count_keyword(self, keyword: str) -> int:
+    def count_keyword(self, keyword: str = '') -> int:
         """
         Counts for given keyword.
         :param keyword: the keyword to count.
@@ -102,12 +102,3 @@ class Database:
             cursor = self._conn.cursor()
             cursor.execute('SELECT count(*) FROM texts WHERE instr(text, ?)', (keyword, ))
             return cursor.fetchone()[0]
-
-    def __len__(self) -> int:
-        """
-        Gets the count of the database.
-        :return: the count of the database.
-        """
-
-        # Count for an empty string to count all.
-        return self.count_keyword('')

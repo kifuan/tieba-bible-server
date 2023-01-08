@@ -117,21 +117,25 @@ def merge_threads() -> None:
     database = Database.get_instance()
     aiotieba.LOG.info('Reading files.')
     # Remove empty texts by the simple condition.
-    len1 = len(database)
+    len1 = database.count_keyword()
     database.add_texts({
         process_text(text)
         for file in THREADS_DIR.iterdir() if file.suffix == '.json'
         for text in ujson.loads(file.read_text('utf8'))
     })
-    aiotieba.LOG.info(f'Added {len(database) - len1} texts.')
+    len2 = database.count_keyword()
+    aiotieba.LOG.info(f'Added {len2 - len1} texts.')
 
 
-if __name__ == '__main__':
+async def main():
     if config.spider.merge_only:
         merge_threads()
     else:
-        asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
+        await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
 
-    # Close the database when the program exits.
     Database.get_instance().close_database()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
 

@@ -1,9 +1,13 @@
 import re
 import ujson
+import aiohttp
 import asyncio
 import aiotieba
 
+
+from yarl import URL
 from pathlib import Path
+
 from config import config
 
 
@@ -86,11 +90,34 @@ def merge_posts() -> None:
     aiotieba.LOG.info('merged all posts.')
 
 
+async def refresh_server_if_configured() -> None:
+    """
+    Reloads the server if config.spider.reload_server is set to true.
+    """
+
+    if not config.spider.reload_server:
+        return
+
+    url = str(URL.build(
+        scheme='http',
+        host=config.server.host,
+        port=config.server.port,
+        path='/reload'
+    ))
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url) as resp:
+            if resp.status != 200:
+                aiotieba.LOG.error('failed to reload the server')
+            else:
+                aiotieba.LOG.info('reload the server successfully')
+
+
 async def start_spider():
     try:
         await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
     finally:
         merge_posts()
+        await refresh_server_if_configured()
 
 
 if __name__ == '__main__':

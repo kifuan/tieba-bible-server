@@ -1,6 +1,3 @@
-import ujson
-
-from pathlib import Path
 from pydantic import BaseModel
 
 
@@ -13,6 +10,9 @@ class ServerConfig(BaseModel):
 
     # Keywords to be cached.
     cached_keywords: list[str]
+
+    # Server host.
+    host: str
 
     # Allowed hosts for security.
     allowed_hosts: list[str]
@@ -30,6 +30,9 @@ class SpiderConfig(BaseModel):
 
     # The forum name to fetch.
     forum_name: str
+
+    # Whether to reload the server after getting data.
+    reload_server: bool
 
 
 class Config(BaseModel):

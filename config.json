@@ -3,10 +3,12 @@
     "forum_name": "复制粘贴",
     "start_page": 1,
     "end_page": 5,
-    "max_post_pages": 10
+    "max_post_pages": 10,
+    "reload_server": true
   },
   "server": {
     "port": 8003,
+    "host": "127.0.0.1",
     "allowed_hosts": [
       "127.0.0.1",
       "localhost"

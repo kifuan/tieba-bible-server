@@ -3,3 +3,5 @@ uvicorn
 fastapi
 aiotieba
 pydantic
+yarl
+aiohttp

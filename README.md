@@ -20,24 +20,7 @@
    pip install -r requirements.txt
    ```
 
-2. 配置 `config.json` 中 `spider` 下的内容，并运行 `spider.py`。
-
-   ```js
-   "spider": {
-       // 吧名，推荐复制粘贴吧。
-       "forum_name": "复制粘贴",
-       // 开始爬取页，包含这页。
-       "start_page": 1,
-       // 结束爬取页，包含这页。
-       "end_page": 5,
-       // 每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
-       "max_post_pages": 10
-   }
-   ```
-
-   配置完了之后运行，首次运行会产生 `aiotieba.toml`，如果出现爬取失败的情况，请参考他们的[官方文档](https://v-8.top/tutorial/quickstart/#_4)来进行配置 `aiotieba.toml`。不过如果你只是需要爬取数据，这应该是**不需要你配置**的，你可以不管它们。
-
-3. 当 `spider.py` 运行结束后，配置 `config.json` 中 `server` 下的内容，每项解释如下。
+3. 配置 `config.json` 中 `server` 下的内容之后开启服务端，每项解释如下。
 
    ```js
    "server": {
@@ -45,6 +28,8 @@
        "port": 8003,
        // 用户上传文本的最大长度，仅在 POST 请求时校验使用，与爬取的数据无关。
        "custom_text_max_size": 200,
+        // uvicorn 运行的 host，推荐设置为 127.0.0.1 即可。
+       "host": "127.0.0.1",
        // 为了安全，推荐只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
        "allowed_hosts": [
             "127.0.0.1",
@@ -70,28 +55,53 @@
 
    此外，你还可以用 `pm2` 等工具来部署，请参考它的[文档](https://pm2.keymetrics.io/docs/usage/quick-start/)进行了解。
 
-4. 有下列 `API` 可供调用，所有 `API` 返回的都是 `application/json` 类型的数据。
+3. 配置 `config.json` 中 `spider` 下的内容，并运行 `spider.py`。
 
-   为了**简化返回数据**，我没有按照传统的方式返回一个 `{success: boolean, message: string, data: any}`，而是以 `HTTP` 状态码的形式说明运行成功与否，这样方便你直接用 `response.json()` 来获取 `API` 的返回结果。
-   
+   注意，你要确保**服务端正在运行**，否则当爬取结束后将不能正确的重新加载服务端。
+
+   ```js
+   "spider": {
+       // 吧名，推荐复制粘贴吧。
+       "forum_name": "复制粘贴",
+       // 开始爬取页，包含这页。
+       "start_page": 1,
+       // 结束爬取页，包含这页。
+       "end_page": 5,
+       // 每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
+       "max_post_pages": 10,
+       // 是否在爬取结束后，重新加载服务端，通过调用 API POST /reload
+       "reload_server": true
+   }
+   ```
+
+   首次运行会产生 `aiotieba.toml`，请参考他们的[官方文档](https://v-8.top/tutorial/quickstart/#_4)来进行配置 `aiotieba.toml`。
+
+   不过如果你只是需要爬取数据，这应该是**不需要你配置**的，你可以不管它。
+
+4. 如果 `spider.py` 还没运行结束，先不要访问 `API`，因为没有数据。
+
+   有下列 `API` 可供调用，所有 `API` 返回的都是 `application/json` 类型的数据。
+
+   为了**简化返回数据**，此项目并没有按照传统的方式返回一个 `{success: boolean, message: string, data: any}`，而是以 `HTTP` 状态码的形式说明运行成功与否，这样方便你直接用 `response.json()` 来获取 `API` 的返回结果。
+
    + 获取指定关键字下的文本数量，不填 `keyword` 获取所有文本的数量。
-   
+
      ```http
      GET /count?keyword=
      ```
-   
+
      返回：`int`，表示文本数量，此 `API` 一般不会报错。
-   
+
    + 从含指定关键字的文本中抽取一个，不填 `keyword` 从全部文本中抽取。
-   
+
      ```http
      GET /text?keyword=
      ```
-   
+
      返回：`str`，表示抽取到的文本或错误信息。如果没有匹配到指定的关键字，它会返回 `404` 状态码。
-   
+
    + 添加自定义文本。你可以传字符串或者数组，注意，如果**任意一个字符串**超过最大要求，本次请求的**所有数据**都将视为无效。
-   
+
      ```http
      POST /text
      {
@@ -109,7 +119,12 @@
      
      返回：`str`，表示成功或错误信息。如果数据校验失败，返回 `400` 状态码。
      
-   + 
+   + 重新加载爬虫数据，这个 `API` 通常是 `spider.py` 在爬取结束后自动调用的。
+     ```http
+     POST /reload
+     ```
+     返回：`true`，这个 `API` 一般不会报错。
+
 ## 安全
 
 上文中提到，此项目并没有做太多的安全措施，以下代码就可以绕过 `TrustedHostMiddleware` 的限制：

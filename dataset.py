@@ -80,16 +80,16 @@ class Dataset:
             for row in cursor.fetchall():
                 yield row[0]
 
-    def add_texts(self, texts: Iterable[tuple[str]]) -> None:
+    def add_texts(self, texts: Iterable[str]) -> None:
         """
         Adds multiple texts to the database.
-        :param texts: as the method `executemany` requires, it should be a generator to generate tuples.
+        :param texts: texts to add.
         """
 
         with self._conn:
             cursor = self._conn.cursor()
             # The executemany needs a generator of tuples.
-            cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', texts)
+            cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', ((text, ) for text in texts))
 
     def count_keyword(self, keyword: str) -> int:
         """

@@ -48,7 +48,7 @@ async def save_posts(client: aiotieba.Client, tid: int) -> None:
     save_file(tid, texts)
 
 
-async def save_page(client: aiotieba.Client, name: str, page_number: int):
+async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:
     threads = await client.get_threads(name, pn=page_number, sort=1)
     for thread in threads:
         await save_posts(client, thread.tid)

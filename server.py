@@ -60,7 +60,7 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
             status_code=400
         )
 
-    Dataset.get_instance().add_texts((text,) for text in texts)
+    Dataset.get_instance().add_texts(texts)
     return ''
 
 

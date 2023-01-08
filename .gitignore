@@ -1,4 +1,5 @@
 .idea
+venv
 
 # Spider data.
 data/raw/*.json

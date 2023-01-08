@@ -111,7 +111,7 @@ async def refresh_server_if_configured() -> None:
                 return
             len_diff = await resp.json(encoding='utf8')
 
-    aiotieba.LOG.info(f'added {len_diff} texts')
+    aiotieba.LOG.info(f'added {len_diff} texts.')
 
 
 async def start_spider():

@@ -80,21 +80,27 @@ async def get_threads(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
     aiotieba.LOG.debug(f'Saved thread contents to {tid}.json.')
 
 
-async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:
+async def save_page(client: aiotieba.Client, name: str, page_number: int) -> int:
     """
     Saves given page.
     :param client: the tieba client.
     :param name: the forum name.
     :param page_number: the page number.
+    :return: added texts.
     """
 
     database = Database.get_instance()
+    total_page_texts = 0
     aiotieba.LOG.debug(f'Saving page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
+
     for thread in threads:
         texts = await get_and_save_thread(thread.tid, get_threads(client, thread.tid))
-        affected_lines = database.add_texts(texts)
-        aiotieba.LOG.info(f'Added {affected_lines} texts.')
+        added_texts = database.add_texts(texts)
+        total_page_texts += added_texts
+        aiotieba.LOG.info(f'Added {added_texts} texts.')
+
+    return total_page_texts
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -105,9 +111,11 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
     :param end_page: the end page number.
     """
 
+    total_texts = 0
     async with aiotieba.Client('default') as client:
         for page in range(start_page, end_page + 1):
-            await save_page(client, name, page)
+            total_texts += await save_page(client, name, page)
+    aiotieba.LOG.info(f'Added {total_texts} texts in total.')
 
 
 def merge_threads() -> None:
@@ -117,12 +125,12 @@ def merge_threads() -> None:
 
     database = Database.get_instance()
     aiotieba.LOG.info('Reading files.')
-    affected_lines = database.add_texts({
+    added_texts = database.add_texts({
         process_text(text)
         for file in THREADS_DIR.iterdir() if file.suffix == '.json'
         for text in ujson.loads(file.read_text('utf8'))
     })
-    aiotieba.LOG.info(f'Added {affected_lines} texts.')
+    aiotieba.LOG.info(f'Added {added_texts} texts.')
 
 
 async def main():

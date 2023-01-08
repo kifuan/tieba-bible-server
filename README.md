@@ -101,8 +101,8 @@
      POST /text
      {
        "text": [
-           "foo",
-           "bar"
+         "foo",
+         "bar"
        ]
      }
      ```

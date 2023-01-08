@@ -96,5 +96,5 @@ async def start_spider(merge_only: bool = False):
 
 
 if __name__ == '__main__':
-    asyncio.run(start_spider(True))
+    asyncio.run(start_spider())
 

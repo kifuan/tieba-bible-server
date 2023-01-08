@@ -66,8 +66,8 @@
        "end_page": 5,
        // 每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
        "max_post_pages": 10,
-       // 是否在爬取结束后，重新加载服务端，通过调用 API POST /reload
-       "reload_server": true
+       // 是否只合并本地爬取到的文件，如果是 true 则不会爬取新的帖子，只会合并本地数据，是作者拿来 debug 用的。
+       "merge_only": false
    }
    ```
 

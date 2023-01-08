@@ -4,7 +4,7 @@
     "start_page": 1,
     "end_page": 5,
     "max_post_pages": 10,
-    "reload_server": true
+    "merge_only": false
   },
   "server": {
     "port": 8003,

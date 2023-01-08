@@ -28,8 +28,8 @@ class SpiderConfig(BaseModel):
     # The forum name to fetch.
     forum_name: str
 
-    # Whether to reload the server after getting data.
-    reload_server: bool
+    # Only merge the posts locally.
+    merge_only: bool
 
 
 class Config(BaseModel):

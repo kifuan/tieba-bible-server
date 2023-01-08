@@ -25,7 +25,7 @@ def get_post_json(tid: int) -> Path:
     return POSTS_DIR / f'{tid}.json'
 
 
-async def save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
+async def get_and_save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
     """
     Saves posts in tid.json and returns the list of texts.
     :param tid: the thread id.
@@ -58,9 +58,10 @@ async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str, Non
 
 async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:
     dataset = Dataset.get_instance()
+    aiotieba.LOG.debug(f'Saving page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
     for thread in threads:
-        texts = await save_posts(thread.tid, get_posts(client, thread.tid))
+        texts = await get_and_save_posts(thread.tid, get_posts(client, thread.tid))
         dataset.add_texts(texts)
 
 
@@ -74,7 +75,6 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
 
     async with aiotieba.Client('default') as client:
         for page in range(start_page, end_page + 1):
-            aiotieba.LOG.debug(f'Saving page {page}.')
             await save_page(client, name, page)
 
 
@@ -93,11 +93,13 @@ def merge_posts() -> None:
     len1 = len(dataset)
     dataset.add_texts(text for text in processed_dataset if text)
     aiotieba.LOG.info(f'Added {len(dataset) - len1} texts.')
-    dataset.close_dataset()
 
 
 if __name__ == '__main__':
-    asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
+    if config.spider.merge_only:
+        merge_posts()
+    else:
+        asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
 
     # Close the dataset when the program exits.
     Dataset.get_instance().close_dataset()

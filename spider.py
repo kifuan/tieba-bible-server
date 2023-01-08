@@ -1,13 +1,12 @@
 import re
 import ujson
-import aiohttp
 import asyncio
 import aiotieba
 
-from yarl import URL
 from pathlib import Path
 
 from config import config
+from dataset import Dataset
 
 
 ROOT_DIR = Path(__file__).parent
@@ -15,8 +14,6 @@ ROOT_DIR = Path(__file__).parent
 DATA_DIR = ROOT_DIR / 'data'
 
 POSTS_DIR = DATA_DIR / 'posts'
-
-SPIDER_FILE = DATA_DIR / 'spider.json'
 
 
 # The regex to remove reply prefix.
@@ -75,42 +72,17 @@ def merge_posts() -> None:
     """
     Merge all posts the spider fetched in JSON files.
     """
-
-    with SPIDER_FILE.open('w', encoding='utf8') as f:
-        # Remove reply prefixes for all texts.
-        processed_dataset = {
-            REPLY_PREFIX_REGEX.sub('', item.strip())
-            for file in POSTS_DIR.iterdir() if file.suffix == '.json'
-            for item in ujson.loads(file.read_text('utf8'))
-        }
-        # Remove empty texts by the simple condition.
-        dataset = [text for text in processed_dataset if text]
-        ujson.dump(dataset, f, ensure_ascii=False)
-    aiotieba.LOG.info('merged all posts.')
-
-
-async def refresh_server_if_configured() -> None:
-    """
-    Reloads the server if config.spider.reload_server is set to true.
-    """
-
-    if not config.spider.reload_server:
-        return
-
-    url = str(URL.build(
-        scheme='http',
-        host=config.server.host,
-        port=config.server.port,
-        path='/reload'
-    ))
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url) as resp:
-            if resp.status != 200:
-                aiotieba.LOG.error('failed to reload the server')
-                return
-            added_len = await resp.json(encoding='utf8')
-
-    aiotieba.LOG.info(f'added {added_len} texts.')
+    dataset = Dataset.get_instance()
+    # Remove reply prefixes for all texts.
+    processed_dataset = {
+        REPLY_PREFIX_REGEX.sub('', item.strip())
+        for file in POSTS_DIR.iterdir() if file.suffix == '.json'
+        for item in ujson.loads(file.read_text('utf8'))
+    }
+    # Remove empty texts by the simple condition.
+    len1 = len(dataset)
+    dataset.add_texts((text, ) for text in processed_dataset if text)
+    aiotieba.LOG.info(f'added {len(dataset) - len1} texts.')
 
 
 async def start_spider(merge_only: bool = False):
@@ -120,8 +92,8 @@ async def start_spider(merge_only: bool = False):
             await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
     finally:
         merge_posts()
-        await refresh_server_if_configured()
 
 
 if __name__ == '__main__':
-    asyncio.run(start_spider())
+    asyncio.run(start_spider(True))
+

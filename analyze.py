@@ -4,11 +4,11 @@ See README.md for detail information.
 """
 
 import re
-import ujson
 import jieba
 import matplotlib.pyplot as plt
 
 from pathlib import Path
+from dataset import Dataset
 from collections import Counter
 
 ROOT = Path(__file__).parent
@@ -29,9 +29,10 @@ plt.rcParams['font.sans-serif'] = FONT
 
 
 def main():
+    dataset = Dataset.get_instance()
     data = Counter(
         word
-        for line in ujson.loads(SPIDER_FILE.read_text('utf8'))
+        for line in dataset
         for word in jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', line))
         if word not in STOPWORDS and not word.isspace()
     )

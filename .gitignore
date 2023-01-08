@@ -3,7 +3,7 @@ venv
 
 # Spider data.
 data/raw/*.json
-data/*.json
+data/db.sqlite
 log
 
 # My personal data.

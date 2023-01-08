@@ -83,6 +83,7 @@ def merge_posts() -> None:
     Merge all posts the spider fetched in JSON files.
     """
     database = Database.get_instance()
+    aiotieba.LOG.info('Reading files.')
     # Remove reply prefixes for all texts.
     processed_texts = {
         REPLY_PREFIX_REGEX.sub('', item.strip())

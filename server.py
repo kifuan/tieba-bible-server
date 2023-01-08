@@ -132,7 +132,7 @@ async def handle_text(keyword: str = ''):
         return random.choice(texts)
 
     return JSONResponse(
-        content=f'no text has matched the specified keyword {keyword}',
+        content=f'no text has matched given keyword {keyword}',
         status_code=404
     )
 
@@ -146,7 +146,7 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
     max_size = config.server.custom_text_max_size
     if any(len(t) > max_size for t in texts):
         return JSONResponse(
-            content=f'max size of custom text is {max_size}',
+            content=f'max size of custom texts should be {max_size}',
             status_code=400
         )
 

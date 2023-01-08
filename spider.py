@@ -39,9 +39,9 @@ def get_thread_json_file(tid: int) -> Path:
     return THREADS_DIR / f'{tid}.json'
 
 
-async def get_and_save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
+async def get_and_save_thread(tid: int, texts: AsyncIterator[str]) -> list[str]:
     """
-    Saves posts in tid.json and returns the list of texts.
+    Saves thread in tid.json and returns the list of texts.
     :param tid: the thread id.
     :param texts: the async generator of texts.
     :return: the list of texts.
@@ -53,16 +53,16 @@ async def get_and_save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
     return list_texts
 
 
-async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
+async def get_threads(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
     """
-    Gets posts.
+    Gets threads.
     :param client: the tieba client.
     :param tid: the thread id.
     :return: the iterator of texts from given thread.
     """
 
     if get_thread_json_file(tid).exists():
-        aiotieba.LOG.warning(f'The thread id file {tid}.json exists. Skipping.')
+        aiotieba.LOG.warning(f'The thread file {tid}.json exists. Skipping.')
         return
 
     page_number = 1
@@ -92,7 +92,7 @@ async def save_page(client: aiotieba.Client, name: str, page_number: int) -> Non
     aiotieba.LOG.debug(f'Saving page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
     for thread in threads:
-        texts = await get_and_save_posts(thread.tid, get_posts(client, thread.tid))
+        texts = await get_and_save_thread(thread.tid, get_threads(client, thread.tid))
         database.add_texts(texts)
 
 
@@ -109,9 +109,9 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
             await save_page(client, name, page)
 
 
-def merge_posts() -> None:
+def merge_threads() -> None:
     """
-    Merge all posts the spider fetched in JSON files.
+    Merge all threads the spider fetched in JSON files.
     """
 
     database = Database.get_instance()
@@ -128,7 +128,7 @@ def merge_posts() -> None:
 
 if __name__ == '__main__':
     if config.spider.merge_only:
-        merge_posts()
+        merge_threads()
     else:
         asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
 

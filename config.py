@@ -28,7 +28,7 @@ class SpiderConfig(BaseModel):
     # The forum name to fetch.
     forum_name: str
 
-    # Only merge the posts locally.
+    # Whether to merge the threads locally.
     merge_only: bool
 
 

@@ -35,10 +35,17 @@ class Database:
         # Initialize the database if it needs to.
         with self._conn:
             cursor = self._conn.cursor()
+
             cursor.execute('''
             CREATE TABLE IF NOT EXISTS texts (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `text` TEXT NOT NULL UNIQUE
+            );
+            ''')
+
+            cursor.execute('''
+            CREATE TABLE IF NOT EXISTS visited_threads (
+                `tid` INTEGER PRIMARY KEY NOT NULL
             );
             ''')
 
@@ -62,7 +69,7 @@ class Database:
 
         with self._conn:
             cursor = self._conn.cursor()
-            cursor.execute('SELECT text FROM texts WHERE instr(text, ?) > 0 ORDER BY random() LIMIT 1', (keyword, ))
+            cursor.execute('SELECT text FROM texts WHERE INSTR(text, ?) > 0 ORDER BY RANDOM() LIMIT 1', (keyword, ))
             if result := cursor.fetchone():
                 return result[0]
 
@@ -79,6 +86,28 @@ class Database:
             cursor.execute('SELECT text FROM texts')
             for row in cursor.fetchall():
                 yield row[0]
+
+    def add_visited_thread(self, tid: int) -> None:
+        """
+        Adds a visited thread id.
+        :param tid: the thread id.
+        """
+
+        with self._conn:
+            cursor = self._conn.cursor()
+            cursor.execute('INSERT OR IGNORE INTO visited_threads (tid) VALUES (?)', (tid, ))
+
+    def check_if_visited_thread(self, tid: int) -> bool:
+        """
+        Checks if the given thread is visited.
+        :param tid: the thread id.
+        :return: whether it is visited.
+        """
+
+        with self._conn:
+            cursor = self._conn.cursor()
+            cursor.execute('SELECT * FROM visited_threads WHERE tid=?', (tid, ))
+            return cursor.fetchone() is not None
 
     def add_texts(self, texts: Iterable[str]) -> int:
         """
@@ -102,5 +131,5 @@ class Database:
 
         with self._conn:
             cursor = self._conn.cursor()
-            cursor.execute('SELECT count(*) FROM texts WHERE instr(text, ?)', (keyword, ))
+            cursor.execute('SELECT COUNT(*) FROM texts WHERE INSTR(text, ?)', (keyword, ))
             return cursor.fetchone()[0]

@@ -32,6 +32,9 @@ def process_text(text: str) -> str:
 def get_thread_json_file(tid: int) -> Path:
     """
     Gets json file path of given thread id.
+    Note that the json files are no longer used.
+    The spider saves data into the database directly.
+    This function is not deleted for compatibility, to check if specified thread is visited.
     :param tid: the thread id.
     :return: the json file path of given thread id.
     """
@@ -39,30 +42,22 @@ def get_thread_json_file(tid: int) -> Path:
     return THREADS_DIR / f'{tid}.json'
 
 
-async def get_and_save_thread(tid: int, texts: AsyncIterator[str]) -> list[str]:
+async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
     """
-    Saves thread in tid.json and returns the list of texts.
-    :param tid: the thread id.
-    :param texts: the async generator of texts.
-    :return: the list of texts.
-    """
-
-    list_texts = [text async for text in texts]
-    with open(get_thread_json_file(tid), 'w', encoding='utf8') as f:
-        ujson.dump(list_texts, f, ensure_ascii=False)
-    return list_texts
-
-
-async def get_threads(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
-    """
-    Gets threads.
+    Gets texts from given thread.
     :param client: the tieba client.
     :param tid: the thread id.
     :return: the iterator of texts from given thread.
     """
 
+    database = Database.get_instance()
+
     if get_thread_json_file(tid).exists():
         aiotieba.LOG.warning(f'The thread file {tid}.json exists. Skipping.')
+        return
+
+    if database.check_if_visited_thread(tid):
+        aiotieba.LOG.warning(f'The thread {tid} is visited. Skipping.')
         return
 
     page_number = 1
@@ -77,30 +72,26 @@ async def get_threads(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
 
         page_number += 1
 
-    aiotieba.LOG.debug(f'Saved thread contents to {tid}.json.')
+    # Adds this thread into visited threads.
+    database.add_visited_thread(tid)
+    aiotieba.LOG.info(f'Saved thread {tid}.')
 
 
-async def save_page(client: aiotieba.Client, name: str, page_number: int) -> int:
+async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -> AsyncIterator[str]:
     """
-    Saves given page.
+    Gets texts from given page.
     :param client: the tieba client.
     :param name: the forum name.
     :param page_number: the page number.
-    :return: added texts.
+    :return: texts to add.
     """
 
-    database = Database.get_instance()
-    total_page_texts = 0
     aiotieba.LOG.debug(f'Saving page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
 
     for thread in threads:
-        texts = await get_and_save_thread(thread.tid, get_threads(client, thread.tid))
-        added_texts = database.add_texts(texts)
-        total_page_texts += added_texts
-        aiotieba.LOG.info(f'Added {added_texts} texts.')
-
-    return total_page_texts
+        async for text in get_thread_texts(client, thread.tid):
+            yield text
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -111,11 +102,13 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
     :param end_page: the end page number.
     """
 
-    total_texts = 0
     async with aiotieba.Client('default') as client:
-        for page in range(start_page, end_page + 1):
-            total_texts += await save_page(client, name, page)
-    aiotieba.LOG.info(f'Added {total_texts} texts in total.')
+        added_texts = Database.get_instance().add_texts([
+            text for page in range(start_page, end_page + 1)
+            async for text in get_page_texts(client, name, page)
+        ])
+
+    aiotieba.LOG.info(f'Added {added_texts} texts.')
 
 
 def merge_threads() -> None:
@@ -125,11 +118,11 @@ def merge_threads() -> None:
 
     database = Database.get_instance()
     aiotieba.LOG.info('Reading files.')
-    added_texts = database.add_texts({
+    added_texts = database.add_texts(
         process_text(text)
         for file in THREADS_DIR.iterdir() if file.suffix == '.json'
         for text in ujson.loads(file.read_text('utf8'))
-    })
+    )
     aiotieba.LOG.info(f'Added {added_texts} texts.')
 
 

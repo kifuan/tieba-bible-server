@@ -108,8 +108,10 @@ async def refresh_server_if_configured() -> None:
         async with session.post(url) as resp:
             if resp.status != 200:
                 aiotieba.LOG.error('failed to reload the server')
-            else:
-                aiotieba.LOG.info('reload the server successfully')
+                return
+            len_diff = await resp.json(encoding='utf8')
+
+    aiotieba.LOG.info(f'added {len_diff} texts')
 
 
 async def start_spider():

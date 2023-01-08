@@ -104,6 +104,9 @@ class Dataset:
         content = ujson.dumps(self._custom, ensure_ascii=False)
         CUSTOM_FILE.write_text(content, encoding='utf8')
 
+    def __len__(self):
+        return len(self._spider) + len(self._custom)
+
     def __iter__(self) -> Iterator[str]:
         """
         Iterates through `self._spider` and `self._custom`.
@@ -156,8 +159,10 @@ async def handle_count(keyword: str = ''):
 
 @app.post('/reload')
 async def handle_reload():
-    Dataset.get_instance().reload_spider_data()
-    return True
+    dataset = Dataset.get_instance()
+    len1 = len(dataset)
+    dataset.reload_spider_data()
+    return len(dataset) - len1
 
 
 if __name__ == '__main__':

@@ -2,9 +2,6 @@ ujson
 uvicorn
 fastapi
 aiotieba
-aiosqlite
 pydantic
-yarl
-aiohttp
 matplotlib
 jieba

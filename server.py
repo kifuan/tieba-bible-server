@@ -1,6 +1,7 @@
 import ujson
 import random
 import uvicorn
+import asyncio
 
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
@@ -9,6 +10,8 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional, Iterator, Union
+
+from spider import start_spider
 
 
 ROOT = Path(__file__).parent
@@ -38,6 +41,9 @@ config = ServerConfig.parse_obj(ujson.loads(CONFIG_FILE.read_text('utf8'))['serv
 
 app = FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.allowed_hosts)
+
+# Keep a global variable reference to the task to avoid being collected by GC.
+spider_task: Optional[asyncio.Task] = None
 
 
 class Dataset:
@@ -72,6 +78,13 @@ class Dataset:
         spider = ujson.loads(SPIDER_FILE.read_text('utf8'))
         custom = ujson.loads(CUSTOM_FILE.read_text('utf8'))
         return cls(spider, custom)
+
+    def reload_spider_data(self) -> None:
+        """
+        Reloads spider data.
+        """
+
+        self._spider = ujson.loads(SPIDER_FILE.read_text('utf8'))
 
     def get_keyword(self, keyword: str) -> list[str]:
         """
@@ -160,6 +173,29 @@ async def handle_count(keyword: str = ''):
     return PlainTextResponse(
         content=str(len(data))
     )
+
+
+def spider_done_callback(_):
+    global spider_task
+
+    Dataset.get_instance().reload_spider_data()
+    spider_task = None
+
+
+@app.post('/spider')
+async def handle_spider():
+    global spider_task
+
+    if spider_task is not None:
+        return PlainTextResponse(
+            content='the spider has already been running',
+            status_code=400
+        )
+
+    spider_task = asyncio.create_task(start_spider())
+    spider_task.add_done_callback(spider_done_callback)
+
+    return PlainTextResponse('started the spider successfully')
 
 
 if __name__ == '__main__':

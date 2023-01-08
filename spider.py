@@ -105,8 +105,12 @@ def merge_posts() -> None:
     aiotieba.LOG.info('merged all posts.')
 
 
-if __name__ == '__main__':
+async def start_spider():
     try:
-        asyncio.run(save_pages(config.forum_name, config.start_page, config.end_page))
+        await save_pages(config.forum_name, config.start_page, config.end_page)
     finally:
         merge_posts()
+
+
+if __name__ == '__main__':
+    asyncio.run(start_spider())

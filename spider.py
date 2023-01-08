@@ -77,7 +77,7 @@ async def get_threads(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
 
         page_number += 1
 
-    aiotieba.LOG.debug(f'Saved post contents to {tid}.json.')
+    aiotieba.LOG.debug(f'Saved thread contents to {tid}.json.')
 
 
 async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:

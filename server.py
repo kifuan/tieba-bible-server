@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from typing import Union
 
 from config import config
-from dataset import Dataset
+from database import Database
 
 
 app = FastAPI()
@@ -24,21 +24,21 @@ class BodyAddCustomTexts(BaseModel):
 
 
 @app.on_event('startup')
-async def init_dataset():
-    # Initialize the dataset on startup.
-    Dataset.get_instance()
-    logger.info('Initialized dataset')
+async def init_database():
+    # Initialize the database on startup.
+    Database.get_instance()
+    logger.info('Initialized database')
 
 
 @app.on_event('shutdown')
-async def close_dataset():
-    Dataset.get_instance().close_dataset()
-    logger.info('Closed dataset')
+async def close_database():
+    Database.get_instance().close_database()
+    logger.info('Closed database')
 
 
 @app.get('/text')
 async def handle_text(keyword: str = ''):
-    if text := Dataset.get_instance().get_random_text(keyword):
+    if text := Database.get_instance().get_random_text(keyword):
         return text
 
     return JSONResponse(
@@ -60,13 +60,13 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
             status_code=400
         )
 
-    Dataset.get_instance().add_texts(texts)
+    Database.get_instance().add_texts(texts)
     return ''
 
 
 @app.get('/count')
 async def handle_count(keyword: str = ''):
-    return Dataset.get_instance().count_keyword(keyword)
+    return Database.get_instance().count_keyword(keyword)
 
 
 if __name__ == '__main__':

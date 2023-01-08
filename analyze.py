@@ -8,7 +8,7 @@ import jieba
 import matplotlib.pyplot as plt
 
 from pathlib import Path
-from dataset import Dataset
+from database import Database
 from collections import Counter
 
 
@@ -28,9 +28,9 @@ plt.rcParams['font.sans-serif'] = FONT
 
 
 def main():
-    dataset = Dataset.get_instance()
+    database = Database.get_instance()
     data = Counter(
-        word for line in dataset
+        word for line in database
         for word in jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', line))
         if word not in STOPWORDS and not word.isspace()
     )

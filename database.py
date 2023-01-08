@@ -7,21 +7,21 @@ from typing import Iterable, Optional, Iterator
 DATABASE_FILE = Path(__file__).parent / 'data' / 'db.sqlite'
 
 
-class Dataset:
+class Database:
     """
-    The dataset to record data from both spider and user.
+    The database to record data from both the spider and the user.
     """
 
-    _instance: Optional['Dataset'] = None
+    _instance: Optional['Database'] = None
 
     def __init__(self, conn: sqlite3.Connection):
         self._conn = conn
         self._init_database()
 
     @classmethod
-    def get_instance(cls) -> 'Dataset':
+    def get_instance(cls) -> 'Database':
         """
-        Gets dataset instance, which is singleton.
+        Gets database instance, which is singleton.
         :return: the instance.
         """
 
@@ -42,9 +42,9 @@ class Dataset:
             );
             ''')
 
-    def close_dataset(self) -> None:
+    def close_database(self) -> None:
         """
-        Closes the dataset.
+        Closes the database.
         It should be called when the program should exit.
         """
 

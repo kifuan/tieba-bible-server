@@ -7,7 +7,7 @@ from typing import AsyncIterator
 from pathlib import Path
 
 from config import config
-from dataset import Dataset
+from database import Database
 
 
 ROOT_DIR = Path(__file__).parent
@@ -57,12 +57,12 @@ async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
 
 
 async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:
-    dataset = Dataset.get_instance()
+    database = Database.get_instance()
     aiotieba.LOG.debug(f'Saving page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
     for thread in threads:
         texts = await get_and_save_posts(thread.tid, get_posts(client, thread.tid))
-        dataset.add_texts(texts)
+        database.add_texts(texts)
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -82,17 +82,17 @@ def merge_posts() -> None:
     """
     Merge all posts the spider fetched in JSON files.
     """
-    dataset = Dataset.get_instance()
+    database = Database.get_instance()
     # Remove reply prefixes for all texts.
-    processed_dataset = {
+    processed_texts = {
         REPLY_PREFIX_REGEX.sub('', item.strip())
         for file in POSTS_DIR.iterdir() if file.suffix == '.json'
         for item in ujson.loads(file.read_text('utf8'))
     }
     # Remove empty texts by the simple condition.
-    len1 = len(dataset)
-    dataset.add_texts(text for text in processed_dataset if text)
-    aiotieba.LOG.info(f'Added {len(dataset) - len1} texts.')
+    len1 = len(database)
+    database.add_texts(text for text in processed_texts if text)
+    aiotieba.LOG.info(f'Added {len(database) - len1} texts.')
 
 
 if __name__ == '__main__':
@@ -101,6 +101,6 @@ if __name__ == '__main__':
     else:
         asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
 
-    # Close the dataset when the program exits.
-    Dataset.get_instance().close_dataset()
+    # Close the database when the program exits.
+    Database.get_instance().close_database()
 

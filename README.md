@@ -24,10 +24,10 @@
 
 2. 配置 `config.json` 中 `server` 下的内容之后开启服务端，每项解释如下。
    
-   + `port`：默认 `8003`，表示运行端口。
-   + `custom_text_max_length`：默认 `200`，表示用户上传文本的最大长度，仅在 `POST /text` 请求时校验使用，与爬取的数据无关。
-   + `host`：默认 `127.0.0.1`，表示 `uvicorn` 运行的 `host`。
-   + `allowed_hosts`：默认 `['127.0.0.1', 'localhost']`，表示允许以那些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
+   + `port`：默认为 `8003`，表示运行端口。
+   + `host`：默认为 `127.0.0.1`，表示 `uvicorn` 运行的 `host`。
+   + `allowed_hosts`：默认为 `['127.0.0.1', 'localhost']`，表示允许以那些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考 https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware 进行配置。
+   + `custom_text_max_length`：默认为 `200`，表示用户上传文本的最大长度，仅在 `POST /text` 请求时校验使用，与爬取的数据无关。
 
    其实我也知道 `allowed_hosts` 通过修改 `HEADERS` 就能被轻松绕过，仅仅是聊胜于无罢了。
 
@@ -106,9 +106,9 @@
 
 你也可以在 `config.json` 中配置这个脚本，以下为每个配置项的解析：
 
-+ `limit`：显示排名前多少的词，默认为 `30`。
-+ `font_name`：传给 `matplotlib` 的字体，默认为 `Microsoft YaHei` 来避免中文乱码。如果你是 `MacOS` 请考虑设置它为 `PingFang SC` 或其它中文字体。
-+ `min_word_length`：最短词长度，默认为 `2`。
++ `limit`：默认为 `30`，表示显示排名前多少的词。
++ `font_name`：默认为 `Microsoft YaHei`，传给 `matplotlib` 的字体来避免中文乱码。如果你是 `MacOS` 请考虑设置它为 `PingFang SC` 或其它中文字体。
++ `min_word_length`：默认为 `2`，表示最短词的长度。
 
 ## 安全
 

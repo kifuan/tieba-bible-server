@@ -61,7 +61,9 @@ class Dataset:
 
         spider = ujson.loads(SPIDER_FILE.read_text('utf8'))
         custom = ujson.loads(CUSTOM_FILE.read_text('utf8'))
-        return cls(spider, custom)
+
+        cls._instance = cls(spider, custom)
+        return cls._instance
 
     def reload_spider_data(self) -> None:
         """

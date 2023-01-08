@@ -11,9 +11,8 @@ from pathlib import Path
 from dataset import Dataset
 from collections import Counter
 
-ROOT = Path(__file__).parent
-SPIDER_FILE = ROOT / 'data' / 'spider.json'
-STOPWORDS_FILE = ROOT / 'stopwords.txt'
+
+STOPWORDS_FILE = Path(__file__).parent / 'data' / 'stopwords.txt'
 STOPWORDS = set(STOPWORDS_FILE.read_text('utf8').splitlines())
 CHINESE_ENGLISH_NUMBER_REGEX = re.compile('[^\u4e00-\u9fa5a-zA-Z0-9]')
 
@@ -31,8 +30,7 @@ plt.rcParams['font.sans-serif'] = FONT
 def main():
     dataset = Dataset.get_instance()
     data = Counter(
-        word
-        for line in dataset
+        word for line in dataset
         for word in jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', line))
         if word not in STOPWORDS and not word.isspace()
     )

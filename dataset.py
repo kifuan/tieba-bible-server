@@ -42,7 +42,12 @@ class Dataset:
             );
             ''')
 
-    def close_dataset(self):
+    def close_dataset(self) -> None:
+        """
+        Closes the dataset.
+        It should be called when the program should exit.
+        """
+
         self._conn.close()
 
         # Clean the instance as well.
@@ -87,6 +92,12 @@ class Dataset:
             cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', texts)
 
     def count_keyword(self, keyword: str) -> int:
+        """
+        Counts for given keyword.
+        :param keyword: the keyword to count.
+        :return: the count of given keyword.
+        """
+
         with self._conn:
             cursor = self._conn.cursor()
             cursor.execute('SELECT COUNT(*) FROM texts WHERE instr(text, ?)', (keyword, ))

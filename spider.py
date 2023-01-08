@@ -38,7 +38,7 @@ async def get_and_save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
     return list_texts
 
 
-async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str, None]:
+async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
     if get_post_json(tid).exists():
         aiotieba.LOG.warning(f'The tid {tid} exists.')
         return

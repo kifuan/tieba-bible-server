@@ -19,6 +19,7 @@ CHINESE_ENGLISH_NUMBER_REGEX = re.compile('[^\u4e00-\u9fa5a-zA-Z0-9]')
 # You can change these two variables.
 FONT = 'Microsoft YaHei'
 LIMIT = 30
+MIN_WORD_LEN = 2
 
 
 # Support for Chinese characters.
@@ -32,7 +33,7 @@ def main():
     data = Counter(
         word for line in database
         for word in jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', line))
-        if word not in STOPWORDS and not word.isspace()
+        if word not in STOPWORDS and len(word) >= MIN_WORD_LEN
     )
     items = sorted(data.items(), key=lambda item: item[1], reverse=True)[:LIMIT]
     if not items:

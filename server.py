@@ -4,7 +4,7 @@ import uvicorn
 import asyncio
 
 from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from pathlib import Path
@@ -140,11 +140,9 @@ class BodyAddCustomTexts(BaseModel):
 @app.get('/text')
 async def handle_text(keyword: str = ''):
     if texts := Dataset.get_instance().get_keyword(keyword):
-        return PlainTextResponse(
-            content=random.choice(texts)
-        )
+        return random.choice(texts)
 
-    return PlainTextResponse(
+    return JSONResponse(
         content=f'no text has matched the specified keyword {keyword}',
         status_code=404
     )
@@ -158,21 +156,18 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
 
     max_size = config.custom_text_max_size
     if any(len(t) > max_size for t in texts):
-        return PlainTextResponse(
+        return JSONResponse(
             content=f'max size of custom text is {max_size}',
             status_code=400
         )
 
     Dataset.get_instance().add_custom_texts(texts)
-    return PlainTextResponse()
+    return ''
 
 
 @app.get('/count')
 async def handle_count(keyword: str = ''):
-    data = Dataset.get_instance().get_keyword(keyword)
-    return PlainTextResponse(
-        content=str(len(data))
-    )
+    return len(Dataset.get_instance().get_keyword(keyword))
 
 
 def spider_done_callback(_):
@@ -182,12 +177,17 @@ def spider_done_callback(_):
     spider_task = None
 
 
+@app.get('/spider')
+async def handle_get_spider_status():
+    return spider_task is not None
+
+
 @app.post('/spider')
-async def handle_spider():
+async def handle_start_spider():
     global spider_task
 
     if spider_task is not None:
-        return PlainTextResponse(
+        return JSONResponse(
             content='the spider has already been running',
             status_code=400
         )
@@ -195,7 +195,7 @@ async def handle_spider():
     spider_task = asyncio.create_task(start_spider())
     spider_task.add_done_callback(spider_done_callback)
 
-    return PlainTextResponse('started the spider successfully')
+    return 'started spider successfully'
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 .idea
 venv
+__pycache__
 
 # Spider data.
 data/raw/*.json

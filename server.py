@@ -126,6 +126,12 @@ class BodyAddCustomTexts(BaseModel):
     text: Union[str, list[str]]
 
 
+@app.on_event('startup')
+async def preload_dataset():
+    # Initialize the dataset on startup.
+    Dataset.get_instance()
+
+
 @app.get('/text')
 async def handle_text(keyword: str = ''):
     if texts := Dataset.get_instance().get_keyword(keyword):

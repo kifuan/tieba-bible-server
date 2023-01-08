@@ -169,7 +169,9 @@ async def handle_reload():
     dataset = Dataset.get_instance()
     len1 = len(dataset)
     dataset.reload_spider_data()
-    return len(dataset) - len1
+    added_len = len(dataset) - len1
+    logger.info(f'Added {added_len} texts.')
+    return added_len
 
 
 if __name__ == '__main__':

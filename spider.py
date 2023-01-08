@@ -4,7 +4,6 @@ import aiohttp
 import asyncio
 import aiotieba
 
-
 from yarl import URL
 from pathlib import Path
 
@@ -109,9 +108,9 @@ async def refresh_server_if_configured() -> None:
             if resp.status != 200:
                 aiotieba.LOG.error('failed to reload the server')
                 return
-            len_diff = await resp.json(encoding='utf8')
+            added_len = await resp.json(encoding='utf8')
 
-    aiotieba.LOG.info(f'added {len_diff} texts.')
+    aiotieba.LOG.info(f'added {added_len} texts.')
 
 
 async def start_spider():

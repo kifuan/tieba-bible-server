@@ -100,7 +100,7 @@ class Database:
 
         with self._conn:
             cursor = self._conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM texts WHERE instr(text, ?)', (keyword, ))
+            cursor.execute('SELECT count(*) FROM texts WHERE instr(text, ?)', (keyword, ))
             return cursor.fetchone()[0]
 
     def __len__(self) -> int:

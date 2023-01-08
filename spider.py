@@ -14,19 +14,29 @@ ROOT_DIR = Path(__file__).parent
 
 DATA_DIR = ROOT_DIR / 'data'
 
-POSTS_DIR = DATA_DIR / 'posts'
+THREADS_DIR = DATA_DIR / 'threads'
 
-
-# The regex to remove reply prefix.
 REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
 
 
 def process_text(text: str) -> str:
+    """
+    Processes the text, removing reply prefix.
+    :param text: the text to process.
+    :return: the processed text.
+    """
+
     return REPLY_PREFIX_REGEX.sub('', text.strip())
 
 
-def get_post_json(tid: int) -> Path:
-    return POSTS_DIR / f'{tid}.json'
+def get_thread_json_file(tid: int) -> Path:
+    """
+    Gets json file path of given thread id.
+    :param tid: the thread id.
+    :return: the json file path of given thread id.
+    """
+
+    return THREADS_DIR / f'{tid}.json'
 
 
 async def get_and_save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
@@ -34,17 +44,25 @@ async def get_and_save_posts(tid: int, texts: AsyncIterator[str]) -> list[str]:
     Saves posts in tid.json and returns the list of texts.
     :param tid: the thread id.
     :param texts: the async generator of texts.
+    :return: the list of texts.
     """
 
     list_texts = [text async for text in texts]
-    with open(get_post_json(tid), 'w', encoding='utf8') as f:
+    with open(get_thread_json_file(tid), 'w', encoding='utf8') as f:
         ujson.dump(list_texts, f, ensure_ascii=False)
     return list_texts
 
 
 async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
-    if get_post_json(tid).exists():
-        aiotieba.LOG.warning(f'The tid {tid} exists.')
+    """
+    Gets posts.
+    :param client: the tieba client.
+    :param tid: the thread id.
+    :return: the iterator of texts from given thread.
+    """
+
+    if get_thread_json_file(tid).exists():
+        aiotieba.LOG.warning(f'The thread id file {tid}.json exists. Skipping.')
         return
 
     page_number = 1
@@ -63,6 +81,13 @@ async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
 
 
 async def save_page(client: aiotieba.Client, name: str, page_number: int) -> None:
+    """
+    Saves given page.
+    :param client: the tieba client.
+    :param name: the forum name.
+    :param page_number: the page number.
+    """
+
     database = Database.get_instance()
     aiotieba.LOG.debug(f'Saving page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
@@ -88,13 +113,14 @@ def merge_posts() -> None:
     """
     Merge all posts the spider fetched in JSON files.
     """
+
     database = Database.get_instance()
     aiotieba.LOG.info('Reading files.')
     # Remove empty texts by the simple condition.
     len1 = len(database)
     database.add_texts({
         process_text(text)
-        for file in POSTS_DIR.iterdir() if file.suffix == '.json'
+        for file in THREADS_DIR.iterdir() if file.suffix == '.json'
         for text in ujson.loads(file.read_text('utf8'))
     })
     aiotieba.LOG.info(f'Added {len(database) - len1} texts.')

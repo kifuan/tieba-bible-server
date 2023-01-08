@@ -42,6 +42,12 @@ class Dataset:
             );
             ''')
 
+    def close_dataset(self):
+        self._conn.close()
+
+        # Clean the instance as well.
+        self.__class__._instance = None
+
     def get_random_text(self, keyword: str) -> Optional[str]:
         """
         Gets a random text which contains the specified keyword.

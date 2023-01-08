@@ -83,6 +83,7 @@ def merge_posts() -> None:
     len1 = len(dataset)
     dataset.add_texts((text, ) for text in processed_dataset if text)
     aiotieba.LOG.info(f'added {len(dataset) - len1} texts.')
+    dataset.close_dataset()
 
 
 async def start_spider(merge_only: bool = False):

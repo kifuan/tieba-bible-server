@@ -24,9 +24,16 @@ class BodyAddCustomTexts(BaseModel):
 
 
 @app.on_event('startup')
-async def preload_dataset():
+async def init_dataset():
     # Initialize the dataset on startup.
     Dataset.get_instance()
+    logger.info('Initialized dataset')
+
+
+@app.on_event('shutdown')
+async def close_dataset():
+    Dataset.get_instance().close_dataset()
+    logger.info('Closed dataset')
 
 
 @app.get('/text')

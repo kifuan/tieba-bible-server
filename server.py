@@ -1,7 +1,6 @@
 import ujson
 import random
 import uvicorn
-import asyncio
 
 from fastapi import FastAPI
 from fastapi.logger import logger
@@ -24,9 +23,6 @@ SPIDER_FILE = DATA_DIR / 'spider.json'
 
 app = FastAPI()
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.server.allowed_hosts)
-
-# Keep a global variable reference to the task to avoid being collected by GC.
-spider_task: Optional[asyncio.Task] = None
 
 
 class Dataset:
@@ -52,7 +48,7 @@ class Dataset:
             return cls._instance
 
         if not SPIDER_FILE.exists():
-            logger.warn('you have not run spider.py yet, please run it when the server is running')
+            logger.warning('you have not run spider.py yet, please run it when the server is running')
             SPIDER_FILE.write_text('[]', encoding='utf8')
 
         if not CUSTOM_FILE.exists():
@@ -174,4 +170,7 @@ async def handle_reload():
 
 
 if __name__ == '__main__':
-    uvicorn.run('__main__:app', port=config.server.port)
+    uvicorn.run(
+        app='__main__:app',
+        port=config.server.port,
+    )

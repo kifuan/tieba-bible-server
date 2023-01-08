@@ -21,6 +21,10 @@ POSTS_DIR = DATA_DIR / 'posts'
 REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
 
 
+def process_text(text: str) -> str:
+    return REPLY_PREFIX_REGEX.sub('', text.strip())
+
+
 def get_post_json(tid: int) -> Path:
     return POSTS_DIR / f'{tid}.json'
 
@@ -48,9 +52,11 @@ async def get_posts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
         await asyncio.sleep(1)
         posts = await client.get_posts(tid, pn=page_number)
         for post in posts:
-            yield post.contents.text
+            yield process_text(post.contents.text)
+
         if not posts.has_more:
             break
+
         page_number += 1
 
     aiotieba.LOG.debug(f'Saved post contents to {tid}.json.')
@@ -84,15 +90,13 @@ def merge_posts() -> None:
     """
     database = Database.get_instance()
     aiotieba.LOG.info('Reading files.')
-    # Remove reply prefixes for all texts.
-    processed_texts = {
-        REPLY_PREFIX_REGEX.sub('', item.strip())
-        for file in POSTS_DIR.iterdir() if file.suffix == '.json'
-        for item in ujson.loads(file.read_text('utf8'))
-    }
     # Remove empty texts by the simple condition.
     len1 = len(database)
-    database.add_texts(text for text in processed_texts if text)
+    database.add_texts({
+        process_text(text)
+        for file in POSTS_DIR.iterdir() if file.suffix == '.json'
+        for text in ujson.loads(file.read_text('utf8'))
+    })
     aiotieba.LOG.info(f'Added {len(database) - len1} texts.')
 
 

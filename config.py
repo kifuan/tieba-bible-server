@@ -5,8 +5,8 @@ class ServerConfig(BaseModel):
     # Server port.
     port: int
 
-    # Max size for custom-upload texts.
-    custom_text_max_size: int
+    # Max length for custom-upload texts.
+    custom_text_max_length: int
 
     # Server host.
     host: str
@@ -32,9 +32,21 @@ class SpiderConfig(BaseModel):
     merge_only: bool
 
 
+class AnalyzerConfig(BaseModel):
+    # The limit to show.
+    limit: int
+
+    # Font name to show.
+    font_name: str
+
+    # Minimal word length to count.
+    min_word_length: int
+
+
 class Config(BaseModel):
     spider: SpiderConfig
     server: ServerConfig
+    analyzer: AnalyzerConfig
 
 
 config: Config = Config.parse_file('config.json')

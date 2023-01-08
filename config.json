@@ -9,10 +9,15 @@
   "server": {
     "port": 8003,
     "host": "127.0.0.1",
-    "custom_text_max_size": 200,
+    "custom_text_max_length": 200,
     "allowed_hosts": [
       "127.0.0.1",
       "localhost"
     ]
+  },
+  "analyzer": {
+    "min_word_length": 2,
+    "limit": 30,
+    "font_name": "Microsoft YaHei"
   }
 }

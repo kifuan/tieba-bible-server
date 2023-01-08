@@ -36,12 +36,7 @@
        "allowed_hosts": [
             "127.0.0.1",
             "localhost"
-        ],
-       // 对这些关键字的查询结果进行缓存，提升运行效率。
-       "cached_keywords": [
-           "原神",
-           "压缩毛巾"
-       ]
+        ]
    }
    ```
    其实我也知道 `allowed_hosts` 通过修改 `HEADERS` 就能被轻松绕过，仅仅是聊胜于无罢了。

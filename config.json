@@ -9,14 +9,10 @@
   "server": {
     "port": 8003,
     "host": "127.0.0.1",
+    "custom_text_max_size": 200,
     "allowed_hosts": [
       "127.0.0.1",
       "localhost"
-    ],
-    "custom_text_max_size": 200,
-    "cached_keywords": [
-      "原神",
-      "压缩毛巾"
     ]
   }
 }

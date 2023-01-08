@@ -8,9 +8,6 @@ class ServerConfig(BaseModel):
     # Max size for custom-upload texts.
     custom_text_max_size: int
 
-    # Keywords to be cached.
-    cached_keywords: list[str]
-
     # Server host.
     host: str
 

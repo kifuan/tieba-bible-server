@@ -11,34 +11,18 @@ from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional, Iterator, Union
 
-
-ROOT = Path(__file__).parent
-
-CONFIG_FILE = ROOT / 'config.json'
-
-CUSTOM_FILE = ROOT / 'data' / 'custom.json'
-
-SPIDER_FILE = ROOT / 'data' / 'spider.json'
+from config import config
 
 
-class ServerConfig(BaseModel):
-    # Server port.
-    port: int
+DATA_DIR = Path(__file__).parent / 'data'
 
-    # Max size for custom-upload texts.
-    custom_text_max_size: int
+CUSTOM_FILE = DATA_DIR / 'custom.json'
 
-    # Keywords to be cached.
-    cached_keywords: list[str]
+SPIDER_FILE = DATA_DIR / 'spider.json'
 
-    # Allowed hosts for security.
-    allowed_hosts: list[str]
-
-
-config = ServerConfig.parse_obj(ujson.loads(CONFIG_FILE.read_text('utf8'))['server'])
 
 app = FastAPI()
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.allowed_hosts)
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.server.allowed_hosts)
 
 # Keep a global variable reference to the task to avoid being collected by GC.
 spider_task: Optional[asyncio.Task] = None
@@ -98,7 +82,7 @@ class Dataset:
         result = [text for text in self if keyword in text]
 
         # Cache the keyword if specified.
-        if keyword in config.cached_keywords:
+        if keyword in config.server.cached_keywords:
             self._caches[keyword] = result
 
         return result
@@ -152,7 +136,7 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
     if isinstance(texts, str):
         texts = [texts]
 
-    max_size = config.custom_text_max_size
+    max_size = config.server.custom_text_max_size
     if any(len(t) > max_size for t in texts):
         return JSONResponse(
             content=f'max size of custom text is {max_size}',
@@ -175,4 +159,4 @@ async def handle_reload():
 
 
 if __name__ == '__main__':
-    uvicorn.run('__main__:app', port=config.port, host='0.0.0.0')
+    uvicorn.run('__main__:app', port=config.server.port)

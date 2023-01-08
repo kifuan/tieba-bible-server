@@ -4,7 +4,7 @@ import asyncio
 import aiotieba
 
 from pathlib import Path
-from pydantic import BaseModel
+from config import config
 
 
 ROOT_DIR = Path(__file__).parent
@@ -15,28 +15,9 @@ POSTS_DIR = DATA_DIR / 'posts'
 
 SPIDER_FILE = DATA_DIR / 'spider.json'
 
-CONFIG_FILE = ROOT_DIR / 'config.json'
-
 
 # The regex to remove reply prefix.
 REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
-
-
-class SpiderConfig(BaseModel):
-    # Max post pages it will get.
-    max_post_pages: int
-
-    # # The start page to fetch.
-    start_page: int
-
-    # The end page to fetch.
-    end_page: int
-
-    # The forum name to fetch.
-    forum_name: str
-
-
-config = SpiderConfig.parse_obj(ujson.loads(CONFIG_FILE.read_text('utf8'))['spider'])
 
 
 def get_post_json(tid: int) -> Path:
@@ -55,7 +36,7 @@ async def save_posts(client: aiotieba.Client, tid: int) -> None:
 
     page_number = 1
     texts = []
-    while page_number <= config.max_post_pages:
+    while page_number <= config.spider.max_post_pages:
         await asyncio.sleep(1)
         posts = await client.get_posts(tid, pn=page_number)
         texts.extend(post.contents.text for post in posts)
@@ -107,7 +88,7 @@ def merge_posts() -> None:
 
 async def start_spider():
     try:
-        await save_pages(config.forum_name, config.start_page, config.end_page)
+        await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
     finally:
         merge_posts()
 

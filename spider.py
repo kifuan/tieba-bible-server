@@ -89,11 +89,6 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
     aiotieba.LOG.info(f'Added {added_texts} texts.')
 
 
-async def main():
-    await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
-    Database.get_instance().close_database()
-
-
 if __name__ == '__main__':
-    asyncio.run(main())
-
+    asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
+    Database.get_instance().close_database()

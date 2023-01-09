@@ -2,7 +2,7 @@ import re
 import asyncio
 import aiotieba
 
-from typing import AsyncIterator
+from typing import AsyncGenerator
 from pathlib import Path
 
 from config import config
@@ -24,7 +24,7 @@ def process_text(text: str) -> str:
     return REPLY_PREFIX_REGEX.sub('', text.strip())
 
 
-async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
+async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[str, None]:
     """
     Gets texts from given thread.
     :param client: the tieba client.
@@ -55,7 +55,7 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncIterator[s
     aiotieba.LOG.info(f'Saved thread {tid}.')
 
 
-async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -> AsyncIterator[str]:
+async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -> AsyncGenerator[str, None]:
     """
     Gets texts from given page.
     :param client: the tieba client.

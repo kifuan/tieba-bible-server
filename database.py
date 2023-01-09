@@ -1,7 +1,7 @@
 import sqlite3
 
 from pathlib import Path
-from typing import Iterable, Optional, Iterator
+from typing import Iterable, Optional, Generator
 
 
 class Database:
@@ -73,7 +73,7 @@ class Database:
         # There is no result in the database.
         return None
 
-    def __iter__(self) -> Iterator[str]:
+    def __iter__(self) -> Generator[str, None, None]:
         """
         Generates all texts in the database.
         """

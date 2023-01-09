@@ -7,7 +7,7 @@ import re
 import jieba
 import matplotlib.pyplot as plt
 
-from typing import Iterator
+from typing import Generator
 from pathlib import Path
 from collections import Counter
 
@@ -26,7 +26,7 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = config.analyzer.font_name
 
 
-def cut_text(text: str) -> Iterator[str]:
+def cut_text(text: str) -> Generator[str, None, None]:
     words = jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', text))
     if config.analyzer.once_per_file:
         words = set(words)

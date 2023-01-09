@@ -9,7 +9,6 @@
     "port": 8003,
     "host": "127.0.0.1",
     "min_text_length": 10,
-    "max_custom_text_length": 200,
     "allowed_hosts": [
       "127.0.0.1",
       "localhost"

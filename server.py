@@ -45,23 +45,6 @@ async def handle_text(keyword: str = '', db: Database = Depends(get_db)):
     )
 
 
-@app.post('/text')
-async def handle_add_custom_texts(body: BodyAddCustomTexts, db: Database = Depends(get_db)):
-    texts = body.text
-    if isinstance(texts, str):
-        texts = [texts]
-
-    max_length = config.server.max_custom_text_length
-    if any(len(t) > max_length for t in texts):
-        return JSONResponse(
-            content=f'the max length of custom texts should be {max_length}',
-            status_code=400,
-        )
-
-    await db.add_texts(texts)
-    return ''
-
-
 @app.get('/count')
 async def handle_count(keyword: str = '', db: Database = Depends(get_db)):
     return await db.count(keyword)

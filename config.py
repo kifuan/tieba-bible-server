@@ -8,9 +8,6 @@ class ServerConfig(BaseModel):
     # Minimum text length when getting from the database.
     min_text_length: int
 
-    # Max length for custom-upload texts.
-    max_custom_text_length: int
-
     # Server host.
     host: str
 

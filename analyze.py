@@ -37,14 +37,21 @@ def cut_text(text: str) -> Generator[str, None, None]:
 
 def main():
     database = Database.get_instance()
+    min_len = config.analyzer.min_word_length
     data = Counter(
         word for text in database
         for word in cut_text(text)
-        if word not in STOPWORDS and len(word) >= config.analyzer.min_word_length
+        if word not in STOPWORDS and len(word) >= min_len
     )
-    items = sorted(data.items(), key=lambda item: item[1], reverse=True)[:config.analyzer.limit]
+    items = sorted(
+        data.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )[:config.analyzer.limit]
+
     if not items:
         raise ValueError('cannot get any data')
+
     words, counts = map(list, zip(*items))
     plt.bar(words, counts)
     plt.title(f'Top {config.analyzer.limit}')

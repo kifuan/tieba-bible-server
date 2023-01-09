@@ -24,7 +24,10 @@ def process_text(text: str) -> str:
     return REPLY_PREFIX_REGEX.sub('', text.strip())
 
 
-async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[str, None]:
+async def get_thread_texts(
+        client: aiotieba.Client,
+        tid: int
+) -> AsyncGenerator[str, None]:
     """
     Gets texts from given thread.
     :param client: the tieba client.
@@ -56,7 +59,11 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
     database.add_visited_thread(tid)
 
 
-async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -> AsyncGenerator[str, None]:
+async def get_page_texts(
+        client: aiotieba.Client,
+        name: str,
+        page_number: int
+) -> AsyncGenerator[str, None]:
     """
     Gets texts from given page.
     :param client: the tieba client.
@@ -91,7 +98,11 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
 
 
 if __name__ == '__main__':
-    asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
+    asyncio.run(save_pages(
+        name=config.spider.forum_name,
+        start_page=config.spider.start_page,
+        end_page=config.spider.end_page,
+    ))
 
     # Close the database when exiting.
     Database.get_instance().close_database()

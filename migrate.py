@@ -6,7 +6,6 @@ from pathlib import Path
 from spider import process_text
 from database import Database
 
-
 THREADS_DIR = Path(__file__).parent / 'data' / 'threads'
 
 
@@ -27,7 +26,10 @@ def migrate() -> None:
 
     if not files:
         shutil.rmtree(THREADS_DIR)
-        print('No thread file in directory threads. Removed directory directly.')
+        print(
+            'No thread file in directory threads.'
+            'Removed directory directly.'
+        )
         return
 
     migrated_texts = database.add_texts(
@@ -36,7 +38,9 @@ def migrate() -> None:
         for text in ujson.loads(file.read_text('utf8'))
     )
 
-    migrated_threads = database.add_visited_threads(int(file.stem) for file in files)
+    migrated_threads = database.add_visited_threads(
+        int(file.stem) for file in files
+    )
 
     print(f'Migrated {migrated_texts} texts, {migrated_threads} threads.')
 

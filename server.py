@@ -13,7 +13,10 @@ from database import Database
 
 
 app = FastAPI()
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.server.allowed_hosts)
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=config.server.allowed_hosts
+)
 
 # Use uvicorn logger.
 logger = logging.getLogger('uvicorn')

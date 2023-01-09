@@ -24,10 +24,7 @@ def process_text(text: str) -> str:
     return REPLY_PREFIX_REGEX.sub('', text.strip())
 
 
-async def get_thread_texts(
-        client: aiotieba.Client,
-        tid: int
-) -> AsyncGenerator[str, None]:
+async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[str, None]:
     """
     Gets texts from given thread.
     :param client: the tieba client.
@@ -59,21 +56,17 @@ async def get_thread_texts(
     database.add_visited_thread(tid)
 
 
-async def get_page_texts(
-        client: aiotieba.Client,
-        name: str,
-        page_number: int
-) -> AsyncGenerator[str, None]:
+async def get_page_texts(client: aiotieba.Client, name: str, pn: int) -> AsyncGenerator[str, None]:
     """
     Gets texts from given page.
     :param client: the tieba client.
     :param name: the forum name.
-    :param page_number: the page number.
+    :param pn: the page number.
     :return: the texts of given pages.
     """
 
-    aiotieba.LOG.debug(f'Getting page {page_number}.')
-    threads = await client.get_threads(name, pn=page_number, sort=1)
+    aiotieba.LOG.debug(f'Getting page {pn}.')
+    threads = await client.get_threads(name, pn=pn, sort=1)
 
     for thread in threads:
         async for text in get_thread_texts(client, thread.tid):
@@ -99,9 +92,9 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
 
 if __name__ == '__main__':
     asyncio.run(save_pages(
-        name=config.spider.forum_name,
-        start_page=config.spider.start_page,
-        end_page=config.spider.end_page,
+        config.spider.forum_name,
+        config.spider.start_page,
+        config.spider.end_page,
     ))
 
     # Close the database when exiting.

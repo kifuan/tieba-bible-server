@@ -35,8 +35,13 @@ class BodyAddCustomTexts(BaseModel):
 
 
 @app.get('/text')
-async def handle_text(keyword: str = '', db: Database = Depends(get_db)):
-    if text := await db.get_random_text(keyword):
+async def handle_text(keyword: str = '', short: bool = False, db: Database = Depends(get_db)):
+    if short:
+        text = await db.get_random_short_text(keyword)
+    else:
+        text = await db.get_random_text(keyword)
+
+    if text:
         return text
 
     return JSONResponse(
@@ -45,25 +50,12 @@ async def handle_text(keyword: str = '', db: Database = Depends(get_db)):
     )
 
 
-@app.get('/text/short')
-async def handle_short_text(keyword: str = '', db: Database = Depends(get_db)):
-    if text := await db.get_random_short_text(keyword):
-        return text
-
-    return JSONResponse(
-        content=f'no short text contains given keyword {keyword}',
-        status_code=404,
-    )
-
-
 @app.get('/count')
-async def handle_count(keyword: str = '', db: Database = Depends(get_db)):
-    return await db.count(keyword)
-
-
-@app.get('/count/short')
-async def handle_count_short(keyword: str = '', db: Database = Depends(get_db)):
-    return await db.count_short(keyword)
+async def handle_count(keyword: str = '', short: bool = False, db: Database = Depends(get_db)):
+    if short:
+        return await db.count_short(keyword)
+    else:
+        return await db.count(keyword)
 
 
 if __name__ == '__main__':

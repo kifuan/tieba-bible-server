@@ -72,20 +72,18 @@ python migrate.py
 
    为了**简化返回数据**，此项目并没有按照传统的方式返回一个 `{success: boolean, message: string, data: any}`，而是以 `HTTP` 状态码的形式说明运行成功与否，这样方便你直接用 `response.json()` 来获取 `API` 的返回结果。
 
-   + 获取指定关键字下的文本或短文本数量，不填 `keyword` 获取所有文本的数量。
+   + 获取指定关键字下的文本或短文本数量，不填 `keyword` 获取所有文本的数量，不填 `short` 默认为 `false` 即获取长文本。
 
      ```http
-     GET /count?keyword=
-     GET /count/short?keyword=
+     GET /count?keyword=关键字&short=true
      ```
 
      返回：`int`，表示文本数量，此 `API` 一般不会报错。
 
-   + 从含指定关键字的文本或短文本中抽取一个，不填 `keyword` 从全部文本中抽取。
+   + 从含指定关键字的文本或短文本中抽取一个，不填 `keyword` 从全部文本中抽取，不填 `short` 默认为 `false` 即获取长文本。
 
      ```http
-     GET /text?keyword=
-     GET /text/short?keyword=
+     GET /text?keyword=关键字&short=false
      ```
 
      返回：`str`，表示抽取到的文本或错误信息。如果没有匹配到指定的关键字，它会返回 `404` 状态码。

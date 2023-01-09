@@ -39,7 +39,7 @@ python migrate.py
    
    + `port`：默认为 `8003`，表示运行端口。
    + `host`：默认为 `127.0.0.1`，表示 `uvicorn` 运行的 `host`。
-   + `allowed_hosts`：默认为 `['127.0.0.1', 'localhost']`，表示允许以那些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考[文档](https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware)进行配置。
+   + `allowed_hosts`：默认为 `['127.0.0.1', 'localhost']`，表示允许以哪些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考[文档](https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware)进行配置。
    + `custom_text_max_length`：默认为 `200`，表示用户上传文本的最大长度，仅在 `POST /text` 请求时校验使用，与爬取的数据无关。
 
    其实我也知道 `allowed_hosts` 通过修改 `HEADERS` 就能被轻松绕过，仅仅是聊胜于无罢了。
@@ -115,7 +115,7 @@ python migrate.py
 以下为 `config.json` 的 `analyzer` 配置下每个配置项的解释：
 
 + `limit`：默认为 `30`，表示显示排名前多少的词。
-+ `font_name`：默认为 `Microsoft YaHei`，传给 `matplotlib` 的字体来避免中文乱码。如果你是 `MacOS` 请考虑设置它为 `PingFang SC` 或其它中文字体。
++ `font_name`：默认为 `Microsoft YaHei`，传给 `matplotlib` 的字体来避免中文乱码。如果你是 `MacOS` 请考虑设置为 `PingFang SC` 或其它中文字体。
 + `min_word_length`：默认为 `2`，表示最短词的长度。
 
 ## 安全

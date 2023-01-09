@@ -26,17 +26,19 @@ def migrate() -> None:
     ]
 
     if not files:
+        shutil.rmtree(THREADS_DIR)
+        print('No thread file in directory threads. Deleted directory directly.')
         return
 
-    added_texts = database.add_texts(
+    migrated_texts = database.add_texts(
         process_text(text)
         for file in files
         for text in ujson.loads(file.read_text('utf8'))
     )
 
-    added_threads = database.add_visited_threads(int(file.stem) for file in files)
+    migrated_threads = database.add_visited_threads(int(file.stem) for file in files)
 
-    print(f'Migrated {added_texts} texts, {added_threads} threads.')
+    print(f'Migrated {migrated_texts} texts, {migrated_threads} threads.')
 
     shutil.rmtree(THREADS_DIR)
     print('Removed threads directory.')

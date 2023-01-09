@@ -1,8 +1,9 @@
 ujson
+jieba
 uvicorn
 fastapi
-aiotieba
 pydantic
+aiotieba
+aiostream
 matplotlib
-jieba
 databases[aiosqlite]

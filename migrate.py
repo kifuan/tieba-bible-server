@@ -27,7 +27,7 @@ def migrate() -> None:
 
     if not files:
         shutil.rmtree(THREADS_DIR)
-        print('No thread file in directory threads. Deleted directory directly.')
+        print('No thread file in directory threads. Removed directory directly.')
         return
 
     migrated_texts = database.add_texts(

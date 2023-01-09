@@ -40,11 +40,11 @@ async def main() -> None:
     database = await Database.get_instance()
 
     min_len = config.analyzer.min_word_length
-    data = Counter(
+    data = Counter([
         word async for text in database
         for word in cut_text(text)
         if word not in STOPWORDS and len(word) >= min_len
-    )
+    ])
 
     items = sorted(
         data.items(),

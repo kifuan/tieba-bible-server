@@ -1,7 +1,7 @@
 import uvicorn
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
@@ -22,6 +22,14 @@ app.add_middleware(
 logger = logging.getLogger('uvicorn')
 
 
+def get_db() -> Database:
+    """
+    It is used for dependency injection.
+    :return: the database instance.
+    """
+    return Database.get_instance()
+
+
 class BodyAddCustomTexts(BaseModel):
     text: Union[str, list[str]]
 
@@ -34,14 +42,14 @@ async def init_database():
 
 
 @app.on_event('shutdown')
-async def close_database():
-    Database.get_instance().close_database()
+async def close_database(db: Database = Depends(get_db)):
+    db.close_database()
     logger.info('Closed database')
 
 
 @app.get('/text')
-async def handle_text(keyword: str = ''):
-    if text := Database.get_instance().get_random_text(keyword):
+async def handle_text(keyword: str = '', db: Database = Depends(get_db)):
+    if text := db.get_random_text(keyword):
         return text
 
     return JSONResponse(
@@ -51,7 +59,7 @@ async def handle_text(keyword: str = ''):
 
 
 @app.post('/text')
-async def handle_add_custom_texts(body: BodyAddCustomTexts):
+async def handle_add_custom_texts(body: BodyAddCustomTexts, db: Database = Depends(get_db)):
     texts = body.text
     if isinstance(texts, str):
         texts = [texts]
@@ -63,13 +71,13 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
             status_code=400,
         )
 
-    Database.get_instance().add_texts(texts)
+    db.add_texts(texts)
     return ''
 
 
 @app.get('/count')
-async def handle_count(keyword: str = ''):
-    return Database.get_instance().count(keyword)
+async def handle_count(keyword: str = '', db: Database = Depends(get_db)):
+    return db.count(keyword)
 
 
 if __name__ == '__main__':

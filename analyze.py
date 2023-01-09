@@ -7,6 +7,7 @@ import re
 import jieba
 import matplotlib.pyplot as plt
 
+from typing import Iterator
 from pathlib import Path
 from collections import Counter
 
@@ -25,11 +26,20 @@ plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = config.analyzer.font_name
 
 
+def cut_text(text: str) -> Iterator[str]:
+    words = jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', text))
+    if config.analyzer.once_per_file:
+        words = set(words)
+
+    for word in words:
+        yield word
+
+
 def main():
     database = Database.get_instance()
     data = Counter(
-        word for line in database
-        for word in jieba.cut(CHINESE_ENGLISH_NUMBER_REGEX.sub('', line))
+        word for text in database
+        for word in cut_text(text)
         if word not in STOPWORDS and len(word) >= config.analyzer.min_word_length
     )
     items = sorted(data.items(), key=lambda item: item[1], reverse=True)[:config.analyzer.limit]

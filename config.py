@@ -39,6 +39,9 @@ class AnalyzerConfig(BaseModel):
     # Minimal word length to count.
     min_word_length: int
 
+    # Whether to count each word once per file.
+    once_per_file: bool
+
 
 class Config(BaseModel):
     spider: SpiderConfig

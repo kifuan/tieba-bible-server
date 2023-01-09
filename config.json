@@ -17,6 +17,7 @@
   "analyzer": {
     "min_word_length": 2,
     "limit": 30,
+    "once_per_file": false,
     "font_name": "Microsoft YaHei"
   }
 }

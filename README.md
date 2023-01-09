@@ -117,6 +117,7 @@ python migrate.py
 + `limit`：默认为 `30`，表示显示排名前多少的词。
 + `font_name`：默认为 `Microsoft YaHei`，传给 `matplotlib` 的字体来避免中文乱码。如果你是 `MacOS` 请考虑设置为 `PingFang SC` 或其它中文字体。
 + `min_word_length`：默认为 `2`，表示最短词的长度。
++ `once_per_file`：默认为 `false`，表示是否每个词在一个文件只统计一次。
 
 ## 安全
 

@@ -5,3 +5,4 @@ aiotieba
 pydantic
 matplotlib
 jieba
+databases[aiosqlite]

@@ -5,6 +5,7 @@ See README.md for detail information.
 
 import re
 import jieba
+import asyncio
 import matplotlib.pyplot as plt
 
 from typing import Generator
@@ -35,14 +36,16 @@ def cut_text(text: str) -> Generator[str, None, None]:
         yield word
 
 
-def main() -> None:
-    database = Database.get_instance()
+async def main() -> None:
+    database = await Database.get_instance()
+
     min_len = config.analyzer.min_word_length
     data = Counter(
-        word for text in database
+        word async for text in database
         for word in cut_text(text)
         if word not in STOPWORDS and len(word) >= min_len
     )
+
     items = sorted(
         data.items(),
         key=lambda item: item[1],
@@ -59,4 +62,4 @@ def main() -> None:
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

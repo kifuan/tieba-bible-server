@@ -32,7 +32,8 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
     :return: the texts of given thread.
     """
 
-    if Database.get_instance().check_if_visited_thread(tid):
+    database = await Database.get_instance()
+    if await database.check_if_visited_thread(tid):
         aiotieba.LOG.warning(f'The thread {tid} is visited. Skipping.')
         return
 
@@ -60,17 +61,15 @@ async def save_page(client: aiotieba.Client, name: str, pn: int) -> None:
     """
 
     aiotieba.LOG.info(f'Getting page {pn}.')
-    database = Database.get_instance()
+    database = await Database.get_instance()
     threads = await client.get_threads(name, pn=pn, sort=1)
-    added_texts = 0
 
     for thread in threads:
-        added_texts += database.add_texts([
+        await database.add_texts([
             text async for text in get_thread_texts(client, thread.tid)
         ])
 
-    added_threads = database.add_visited_threads(thread.tid for thread in threads)
-    aiotieba.LOG.info(f'Added {added_threads} threads containing {added_texts} texts from page {pn}.')
+    await database.add_visited_threads(thread.tid for thread in threads)
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -92,6 +91,3 @@ if __name__ == '__main__':
         config.spider.start_page,
         config.spider.end_page,
     ))
-
-    # Close the database when exiting.
-    Database.get_instance().close_database()

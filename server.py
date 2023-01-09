@@ -22,34 +22,21 @@ app.add_middleware(
 logger = logging.getLogger('uvicorn')
 
 
-def get_db() -> Database:
+async def get_db() -> Database:
     """
     It is used for dependency injection.
     :return: the database instance.
     """
-    return Database.get_instance()
+    return await Database.get_instance()
 
 
 class BodyAddCustomTexts(BaseModel):
     text: Union[str, list[str]]
 
 
-@app.on_event('startup')
-async def init_database():
-    # Initialize the database on startup.
-    Database.get_instance()
-    logger.info('Initialized database')
-
-
-@app.on_event('shutdown')
-async def close_database():
-    Database.get_instance().close_database()
-    logger.info('Closed database')
-
-
 @app.get('/text')
 async def handle_text(keyword: str = '', db: Database = Depends(get_db)):
-    if text := db.get_random_text(keyword):
+    if text := await db.get_random_text(keyword):
         return text
 
     return JSONResponse(
@@ -71,13 +58,13 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts, db: Database = Depen
             status_code=400,
         )
 
-    db.add_texts(texts)
+    await db.add_texts(texts)
     return ''
 
 
 @app.get('/count')
 async def handle_count(keyword: str = '', db: Database = Depends(get_db)):
-    return db.count(keyword)
+    return await db.count(keyword)
 
 
 if __name__ == '__main__':

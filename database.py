@@ -43,25 +43,6 @@ class Database:
         cls._instance = cls(db)
         return cls._instance
 
-    async def get_random_text(self, keyword: str) -> Optional[str]:
-        """
-        Gets a random text which contains the keyword.
-        :param keyword: the keyword to filter.
-        :return: the random text, which will be None if no text contains the keyword.
-        """
-
-        async with self._db as db:
-            query = (
-                'SELECT text FROM texts WHERE LENGTH(text) >= :min_len AND '
-                'INSTR(text, :keyword) > 0 ORDER BY RANDOM() LIMIT 1'
-            )
-            values = {'keyword': keyword, 'min_len': config.server.min_text_length}
-            if result := await db.fetch_one(query, values):
-                return result[0]
-
-        # There is no result in the database.
-        return None
-
     async def __aiter__(self) -> AsyncGenerator[str, None]:
         """
         Generates all texts in the database.
@@ -104,6 +85,25 @@ class Database:
             query = 'INSERT OR IGNORE INTO texts (text) VALUES (:text)'
             values = [{'text': text} for text in texts]
             await db.execute_many(query, values)
+
+    async def get_random_text(self, keyword: str) -> Optional[str]:
+        """
+        Gets a random text which contains the keyword.
+        :param keyword: the keyword to filter.
+        :return: the random text, which will be None if no text contains the keyword.
+        """
+
+        async with self._db as db:
+            query = (
+                'SELECT text FROM texts WHERE LENGTH(text) >= :min_len AND '
+                'INSTR(text, :keyword) > 0 ORDER BY RANDOM() LIMIT 1'
+            )
+            values = {'keyword': keyword, 'min_len': config.server.min_text_length}
+            if result := await db.fetch_one(query, values):
+                return result[0]
+
+        # There is no result in the database.
+        return None
 
     async def count(self, keyword: str) -> int:
         """

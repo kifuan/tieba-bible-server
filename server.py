@@ -51,7 +51,7 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts, db: Database = Depen
     if isinstance(texts, str):
         texts = [texts]
 
-    max_length = config.server.custom_text_max_length
+    max_length = config.server.max_custom_text_length
     if any(len(t) > max_length for t in texts):
         return JSONResponse(
             content=f'the max length of custom texts should be {max_length}',

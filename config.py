@@ -9,7 +9,7 @@ class ServerConfig(BaseModel):
     min_text_length: int
 
     # Max length for custom-upload texts.
-    custom_text_max_length: int
+    max_custom_text_length: int
 
     # Server host.
     host: str

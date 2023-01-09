@@ -84,16 +84,6 @@ class Database:
             for row in cursor.fetchall():
                 yield row[0]
 
-    def add_visited_thread(self, tid: int) -> None:
-        """
-        Adds a visited thread id.
-        :param tid: the thread id.
-        """
-
-        with self._conn:
-            cursor = self._conn.cursor()
-            cursor.execute('INSERT OR IGNORE INTO visited_threads (tid) VALUES (?)', (tid, ))
-
     def add_visited_threads(self, tid: Iterable[int]) -> int:
         """
         Adds multiple visited thread ids.

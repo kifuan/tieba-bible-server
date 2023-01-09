@@ -32,9 +32,7 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
     :return: the texts of given thread.
     """
 
-    database = Database.get_instance()
-
-    if database.check_if_visited_thread(tid):
+    if Database.get_instance().check_if_visited_thread(tid):
         aiotieba.LOG.warning(f'The thread {tid} is visited. Skipping.')
         return
 
@@ -48,29 +46,31 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
             yield process_text(post.contents.text)
 
         if not posts.has_more:
-            break
+            return
 
         page_number += 1
 
-    # Adds this thread into visited threads.
-    database.add_visited_thread(tid)
 
-
-async def get_page_texts(client: aiotieba.Client, name: str, pn: int) -> AsyncGenerator[str, None]:
+async def save_page(client: aiotieba.Client, name: str, pn: int) -> None:
     """
     Gets texts from given page.
     :param client: the tieba client.
     :param name: the forum name.
     :param pn: the page number.
-    :return: the texts of given pages.
     """
 
-    aiotieba.LOG.debug(f'Getting page {pn}.')
+    aiotieba.LOG.info(f'Getting page {pn}.')
+    database = Database.get_instance()
     threads = await client.get_threads(name, pn=pn, sort=1)
+    added_texts = 0
 
     for thread in threads:
-        async for text in get_thread_texts(client, thread.tid):
-            yield text
+        added_texts += database.add_texts([
+            text async for text in get_thread_texts(client, thread.tid)
+        ])
+
+    added_threads = database.add_visited_threads(thread.tid for thread in threads)
+    aiotieba.LOG.info(f'Added {added_threads} threads containing {added_texts} texts from page {pn}.')
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:
@@ -82,12 +82,8 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
     """
 
     async with aiotieba.Client('default') as client:
-        added_texts = Database.get_instance().add_texts([
-            text for page_number in range(start_page, end_page + 1)
-            async for text in get_page_texts(client, name, page_number)
-        ])
-
-    aiotieba.LOG.info(f'Added {added_texts} texts.')
+        for page_number in range(start_page, end_page + 1):
+            await save_page(client, name, page_number)
 
 
 if __name__ == '__main__':

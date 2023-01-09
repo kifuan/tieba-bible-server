@@ -38,6 +38,8 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
         aiotieba.LOG.warning(f'The thread {tid} is visited. Skipping.')
         return
 
+    aiotieba.LOG.info(f'Getting thread {tid}.')
+
     page_number = 1
     while page_number <= config.spider.max_post_pages:
         await asyncio.sleep(1)
@@ -52,7 +54,6 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
 
     # Adds this thread into visited threads.
     database.add_visited_thread(tid)
-    aiotieba.LOG.info(f'Saved thread {tid}.')
 
 
 async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -> AsyncGenerator[str, None]:
@@ -64,7 +65,7 @@ async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -
     :return: the texts of given pages.
     """
 
-    aiotieba.LOG.debug(f'Saving page {page_number}.')
+    aiotieba.LOG.debug(f'Getting page {page_number}.')
     threads = await client.get_threads(name, pn=page_number, sort=1)
 
     for thread in threads:

@@ -16,7 +16,7 @@ async def migrate() -> None:
     """
 
     if not THREADS_DIR.exists():
-        print('You has already migrated.')
+        print('You don\'t need to migrate.')
         return
 
     database = await Database.get_instance()

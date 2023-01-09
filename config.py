@@ -5,6 +5,9 @@ class ServerConfig(BaseModel):
     # Server port.
     port: int
 
+    # Minimum text length when getting from the database.
+    min_text_length: int
+
     # Max length for custom-upload texts.
     custom_text_max_length: int
 
@@ -36,7 +39,7 @@ class AnalyzerConfig(BaseModel):
     # Font name to show.
     font_name: str
 
-    # Minimal word length to count.
+    # Minimum word length to count.
     min_word_length: int
 
     # Whether to count each word once per file.

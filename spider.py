@@ -1,5 +1,4 @@
 import re
-import ujson
 import asyncio
 import aiotieba
 
@@ -10,11 +9,7 @@ from config import config
 from database import Database
 
 
-ROOT_DIR = Path(__file__).parent
-
-DATA_DIR = ROOT_DIR / 'data'
-
-THREADS_DIR = DATA_DIR / 'threads'
+DATA_DIR = Path(__file__).parent / 'data'
 
 REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
 
@@ -29,19 +24,6 @@ def process_text(text: str) -> str:
     return REPLY_PREFIX_REGEX.sub('', text.strip())
 
 
-def get_thread_json_file(tid: int) -> Path:
-    """
-    Gets json file path of given thread id.
-    Note that the json files are no longer used.
-    The spider saves data into the database directly.
-    This function is not deleted for compatibility, to check if specified thread is visited.
-    :param tid: the thread id.
-    :return: the json file path of given thread id.
-    """
-
-    return THREADS_DIR / f'{tid}.json'
-
-
 async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncIterator[str]:
     """
     Gets texts from given thread.
@@ -51,10 +33,6 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncIterator[s
     """
 
     database = Database.get_instance()
-
-    if get_thread_json_file(tid).exists():
-        aiotieba.LOG.warning(f'The thread file {tid}.json exists. Skipping.')
-        return
 
     if database.check_if_visited_thread(tid):
         aiotieba.LOG.warning(f'The thread {tid} is visited. Skipping.')

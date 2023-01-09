@@ -35,7 +35,7 @@ def cut_text(text: str) -> Generator[str, None, None]:
         yield word
 
 
-def main():
+def main() -> None:
     database = Database.get_instance()
     min_len = config.analyzer.min_word_length
     data = Counter(

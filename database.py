@@ -31,16 +31,11 @@ class Database:
     def _init_database(self) -> None:
         # Initialize the database if it needs to.
         with self._conn:
-            cursor = self._conn.cursor()
-
-            cursor.execute('''
+            self._conn.executescript('''
             CREATE TABLE IF NOT EXISTS texts (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `text` TEXT NOT NULL UNIQUE
             );
-            ''')
-
-            cursor.execute('''
             CREATE TABLE IF NOT EXISTS visited_threads (
                 `tid` INTEGER PRIMARY KEY NOT NULL
             );
@@ -65,9 +60,10 @@ class Database:
         """
 
         with self._conn:
-            cursor = self._conn.cursor()
-            cursor.execute('SELECT text FROM texts WHERE INSTR(text, ?) > 0 ORDER BY RANDOM() LIMIT 1', (keyword, ))
-            if result := cursor.fetchone():
+            if result := self._conn.execute(
+                'SELECT text FROM texts WHERE INSTR(text, ?) > 0 ORDER BY RANDOM() LIMIT 1',
+                (keyword, ),
+            ).fetchone():
                 return result[0]
 
         # There is no result in the database.
@@ -79,9 +75,7 @@ class Database:
         """
 
         with self._conn:
-            cursor = self._conn.cursor()
-            cursor.execute('SELECT text FROM texts')
-            for row in cursor.fetchall():
+            for row in self._conn.execute('SELECT text FROM texts'):
                 yield row[0]
 
     def add_visited_threads(self, tid: Iterable[int]) -> int:
@@ -92,9 +86,10 @@ class Database:
         """
 
         with self._conn:
-            cursor = self._conn.cursor()
-            cursor.executemany('INSERT OR IGNORE INTO visited_threads (tid) VALUES (?)', ((t, ) for t in tid))
-            return cursor.rowcount
+            return self._conn.executemany(
+                'INSERT OR IGNORE INTO visited_threads (tid) VALUES (?)',
+                ((t, ) for t in tid)
+            ).rowcount
 
     def check_if_visited_thread(self, tid: int) -> bool:
         """
@@ -104,9 +99,9 @@ class Database:
         """
 
         with self._conn:
-            cursor = self._conn.cursor()
-            cursor.execute('SELECT * FROM visited_threads WHERE tid=?', (tid, ))
-            return cursor.fetchone() is not None
+            return self._conn.execute(
+                'SELECT * FROM visited_threads WHERE tid=?', (tid, )
+            ).fetchone() is not None
 
     def add_texts(self, texts: Iterable[str]) -> int:
         """
@@ -116,10 +111,10 @@ class Database:
         """
 
         with self._conn:
-            cursor = self._conn.cursor()
-            # The executemany needs a generator of tuples.
-            cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', ((text, ) for text in texts))
-            return cursor.rowcount
+            return self._conn.executemany(
+                'INSERT OR IGNORE INTO texts (text) VALUES (?)',
+                ((text, ) for text in texts)
+            ).rowcount
 
     def count(self, keyword: str) -> int:
         """
@@ -129,6 +124,6 @@ class Database:
         """
 
         with self._conn:
-            cursor = self._conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM texts WHERE INSTR(text, ?)', (keyword, ))
-            return cursor.fetchone()[0]
+            return self._conn.execute(
+                'SELECT COUNT(*) FROM texts WHERE INSTR(text, ?)', (keyword, )
+            ).fetchone()[0]

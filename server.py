@@ -42,8 +42,8 @@ async def init_database():
 
 
 @app.on_event('shutdown')
-async def close_database(db: Database = Depends(get_db)):
-    db.close_database()
+async def close_database():
+    Database.get_instance().close_database()
     logger.info('Closed database')
 
 

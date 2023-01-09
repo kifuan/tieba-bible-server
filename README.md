@@ -40,7 +40,7 @@ python migrate.py
    + `port`：默认为 `8003`，表示运行端口。
    + `host`：默认为 `127.0.0.1`，表示 `uvicorn` 运行的 `host`。
    + `allowed_hosts`：默认为 `['127.0.0.1', 'localhost']`，表示允许以哪些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考[文档](https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware)进行配置。
-   + `short_length`：默认为 `50`，表示查询文本的最短长度，短文本的最大长度。
+   + `short_length`：默认为 `50`，表示普通文本的最短长度，或者短文本的最大长度。
 
    其实我也知道 `allowed_hosts` 通过修改 `HEADERS` 就能被轻松绕过，仅仅是聊胜于无罢了。
 

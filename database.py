@@ -97,6 +97,18 @@ class Database:
             cursor = self._conn.cursor()
             cursor.execute('INSERT OR IGNORE INTO visited_threads (tid) VALUES (?)', (tid, ))
 
+    def add_visited_threads(self, tid: Iterable[int]) -> int:
+        """
+        Adds multiple visited thread ids.
+        :param tid: multiple thread ids.
+        :return: the count of added threads.
+        """
+
+        with self._conn:
+            cursor = self._conn.cursor()
+            cursor.executemany('INSERT OR IGNORE INTO visited_threads (tid) VALUES (?)', ((t, ) for t in tid))
+            return cursor.rowcount
+
     def check_if_visited_thread(self, tid: int) -> bool:
         """
         Checks if the given thread is visited.

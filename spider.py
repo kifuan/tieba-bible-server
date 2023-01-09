@@ -111,27 +111,8 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
     aiotieba.LOG.info(f'Added {added_texts} texts.')
 
 
-def merge_threads() -> None:
-    """
-    Merge all threads the spider fetched in JSON files.
-    """
-
-    database = Database.get_instance()
-    aiotieba.LOG.info('Reading files.')
-    added_texts = database.add_texts(
-        process_text(text)
-        for file in THREADS_DIR.iterdir() if file.suffix == '.json'
-        for text in ujson.loads(file.read_text('utf8'))
-    )
-    aiotieba.LOG.info(f'Added {added_texts} texts.')
-
-
 async def main():
-    if config.spider.merge_only:
-        merge_threads()
-    else:
-        await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
-
+    await save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page)
     Database.get_instance().close_database()
 
 

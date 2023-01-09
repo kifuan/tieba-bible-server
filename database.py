@@ -11,7 +11,7 @@ class Database:
 
     _instance: Optional['Database'] = None
 
-    def __init__(self, conn: sqlite3.Connection):
+    def __init__(self, conn: sqlite3.Connection) -> None:
         self._conn = conn
         self._init_database()
 
@@ -28,7 +28,7 @@ class Database:
 
         return cls._instance
 
-    def _init_database(self):
+    def _init_database(self) -> None:
         # Initialize the database if it needs to.
         with self._conn:
             cursor = self._conn.cursor()

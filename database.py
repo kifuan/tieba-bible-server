@@ -4,9 +4,6 @@ from pathlib import Path
 from typing import Iterable, Optional, Iterator
 
 
-DATABASE_FILE = Path(__file__).parent / 'data' / 'db.sqlite'
-
-
 class Database:
     """
     The database to record data from both the spider and the user.
@@ -26,7 +23,7 @@ class Database:
         """
 
         if cls._instance is None:
-            conn = sqlite3.connect(DATABASE_FILE)
+            conn = sqlite3.connect(Path(__file__).parent / 'data' / 'db.sqlite')
             cls._instance = cls(conn)
 
         return cls._instance

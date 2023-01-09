@@ -8,10 +8,10 @@ import jieba
 import matplotlib.pyplot as plt
 
 from pathlib import Path
-from database import Database
 from collections import Counter
 
 from config import config
+from database import Database
 
 
 STOPWORDS_FILE = Path(__file__).parent / 'data' / 'stopwords.txt'

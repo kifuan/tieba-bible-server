@@ -131,7 +131,7 @@ class Database:
 
         async with self._db as db:
             query = (
-                'SELECT COUNT(*) FROM texts WHERE (text) >= :short_len AND '
+                'SELECT COUNT(*) FROM texts WHERE LENGTH(text) >= :short_len AND '
                 'INSTR(text, :keyword) > 0'
             )
             values = {'keyword': keyword, 'short_len': config.server.short_length}

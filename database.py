@@ -52,7 +52,7 @@ class Database:
     def close_database(self) -> None:
         """
         Closes the database.
-        It should be called when the program should exit.
+        It should be called when exiting.
         """
 
         self._conn.close()
@@ -64,7 +64,7 @@ class Database:
         """
         Gets a random text which contains the keyword.
         :param keyword: the keyword to filter.
-        :return: the random text, it will be None if no text contains the keyword.
+        :return: the random text, which will be None if no text contains the keyword.
         """
 
         with self._conn:

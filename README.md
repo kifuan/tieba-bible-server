@@ -40,7 +40,7 @@ python migrate.py
    + `port`：默认为 `8003`，表示运行端口。
    + `host`：默认为 `127.0.0.1`，表示 `uvicorn` 运行的 `host`。
    + `allowed_hosts`：默认为 `['127.0.0.1', 'localhost']`，表示允许以哪些 `host` 访问，为了安全，推荐保留默认值只允许本地访问，参考[文档](https://fastapi.tiangolo.com/zh/advanced/middleware/#trustedhostmiddleware)进行配置。
-   + `short_length`：默认为 `100`，表示普通文本的最短长度，或者短文本的最大长度。
+   + `short_length`：默认为 `100`，表示短文本的最大长度。
 
    其实我也知道 `allowed_hosts` 通过修改 `HEADERS` 就能被轻松绕过，仅仅是聊胜于无罢了。
 
@@ -72,7 +72,7 @@ python migrate.py
 
    为了**简化返回数据**，此项目并没有按照传统的方式返回一个 `{success: boolean, message: string, data: any}`，而是以 `HTTP` 状态码的形式说明运行成功与否，这样方便你直接用 `response.json()` 来获取 `API` 的返回结果。
 
-   + 获取指定关键字下的文本或短文本数量，不填 `keyword` 获取所有文本的数量，不填 `short` 默认为 `false` 即获取长文本。
+   + 统计指定关键字下的所有文本或短文本数量，不填 `keyword` 统计所有文本的数量，不填 `short` 默认为 `false` 即统计所有文本。
 
      ```http
      GET /count?keyword=关键字&short=true
@@ -80,7 +80,7 @@ python migrate.py
 
      返回：`int`，表示文本数量，此 `API` 一般不会报错。
 
-   + 从含指定关键字的文本或短文本中抽取一个，不填 `keyword` 从全部文本中抽取，不填 `short` 默认为 `false` 即获取长文本。
+   + 从含指定关键字的所有文本或短文本中抽取一个，不填 `keyword` 从全部文本中抽取，不填 `short` 默认为 `false` 即从所有文本中获取。
 
      ```http
      GET /text?keyword=关键字&short=false

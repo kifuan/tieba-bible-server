@@ -95,10 +95,10 @@ class Database:
 
         async with self._db as db:
             query = (
-                'SELECT text FROM texts WHERE LENGTH(text) >= :short_len AND '
-                'INSTR(text, :keyword) > 0 ORDER BY RANDOM() LIMIT 1'
+                'SELECT text FROM texts WHERE INSTR(text, :keyword) > 0 '
+                'ORDER BY RANDOM() LIMIT 1'
             )
-            values = {'keyword': keyword, 'short_len': config.server.short_length}
+            values = {'keyword': keyword}
             if result := await db.fetch_one(query, values):
                 return result[0]
 
@@ -131,10 +131,9 @@ class Database:
 
         async with self._db as db:
             query = (
-                'SELECT COUNT(*) FROM texts WHERE LENGTH(text) >= :short_len AND '
-                'INSTR(text, :keyword) > 0'
+                'SELECT COUNT(*) FROM texts WHERE INSTR(text, :keyword) > 0'
             )
-            values = {'keyword': keyword, 'short_len': config.server.short_length}
+            values = {'keyword': keyword}
             count = await db.fetch_one(query, values)
             return count[0]
 

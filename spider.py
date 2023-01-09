@@ -29,7 +29,7 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncIterator[s
     Gets texts from given thread.
     :param client: the tieba client.
     :param tid: the thread id.
-    :return: the iterator of texts from given thread.
+    :return: the texts of given thread.
     """
 
     database = Database.get_instance()
@@ -61,7 +61,7 @@ async def get_page_texts(client: aiotieba.Client, name: str, page_number: int) -
     :param client: the tieba client.
     :param name: the forum name.
     :param page_number: the page number.
-    :return: texts to add.
+    :return: the texts of given pages.
     """
 
     aiotieba.LOG.debug(f'Saving page {page_number}.')
@@ -82,8 +82,8 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
 
     async with aiotieba.Client('default') as client:
         added_texts = Database.get_instance().add_texts([
-            text for page in range(start_page, end_page + 1)
-            async for text in get_page_texts(client, name, page)
+            text for page_number in range(start_page, end_page + 1)
+            async for text in get_page_texts(client, name, page_number)
         ])
 
     aiotieba.LOG.info(f'Added {added_texts} texts.')
@@ -91,4 +91,6 @@ async def save_pages(name: str, start_page: int, end_page: int) -> None:
 
 if __name__ == '__main__':
     asyncio.run(save_pages(config.spider.forum_name, config.spider.start_page, config.spider.end_page))
+
+    # Close the database when exiting.
     Database.get_instance().close_database()

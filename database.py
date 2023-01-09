@@ -131,7 +131,7 @@ class Database:
             cursor.executemany('INSERT OR IGNORE INTO texts (text) VALUES (?)', ((text, ) for text in texts))
             return cursor.rowcount
 
-    def count_keyword(self, keyword: str = '') -> int:
+    def count(self, keyword: str) -> int:
         """
         Counts for given keyword.
         :param keyword: the keyword to count.

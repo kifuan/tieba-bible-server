@@ -66,7 +66,7 @@ async def handle_add_custom_texts(body: BodyAddCustomTexts):
 
 @app.get('/count')
 async def handle_count(keyword: str = ''):
-    return Database.get_instance().count_keyword(keyword)
+    return Database.get_instance().count(keyword)
 
 
 if __name__ == '__main__':

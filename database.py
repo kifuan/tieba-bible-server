@@ -88,21 +88,38 @@ class Database:
 
     async def get_random_text(self, keyword: str) -> Optional[str]:
         """
-        Gets a random text which contains the keyword.
-        :param keyword: the keyword to filter.
+        Gets a random text by given keyword.
+        :param keyword: the keyword.
         :return: the random text, which will be None if no text contains the keyword.
         """
 
         async with self._db as db:
             query = (
-                'SELECT text FROM texts WHERE LENGTH(text) >= :min_len AND '
+                'SELECT text FROM texts WHERE LENGTH(text) >= :short_len AND '
                 'INSTR(text, :keyword) > 0 ORDER BY RANDOM() LIMIT 1'
             )
-            values = {'keyword': keyword, 'min_len': config.server.min_text_length}
+            values = {'keyword': keyword, 'short_len': config.server.short_length}
             if result := await db.fetch_one(query, values):
                 return result[0]
 
-        # There is no result in the database.
+        return None
+
+    async def get_random_short_text(self, keyword: str) -> Optional[str]:
+        """
+        Gets a random text whose length is less than min_text_length.
+        :param keyword: the keyword.
+        :return: the random text, which will be None if no text contains the keyword.
+        """
+
+        async with self._db as db:
+            query = (
+                'SELECT text FROM texts WHERE LENGTH(text) < :short_len AND '
+                'INSTR (text, :keyword) > 0 ORDER BY RANDOM() LIMIT 1'
+            )
+            values = {'keyword': keyword, 'short_len': config.server.short_length}
+            if result := await db.fetch_one(query, values):
+                return result[0]
+
         return None
 
     async def count(self, keyword: str) -> int:
@@ -113,7 +130,26 @@ class Database:
         """
 
         async with self._db as db:
-            query = 'SELECT COUNT(*) FROM texts WHERE LENGTH(text) >= :min_len AND INSTR(text, :keyword)'
-            values = {'keyword': keyword, 'min_len': config.server.min_text_length}
+            query = (
+                'SELECT COUNT(*) FROM texts WHERE (text) >= :short_len AND '
+                'INSTR(text, :keyword) > 0'
+            )
+            values = {'keyword': keyword, 'short_len': config.server.short_length}
+            count = await db.fetch_one(query, values)
+            return count[0]
+
+    async def count_short(self, keyword: str) -> int:
+        """
+        Counts short texts by given keyword.
+        :param keyword: the keyword to  count.
+        :return: the count of given keyword.
+        """
+
+        async with self._db as db:
+            query = (
+                'SELECT COUNT(*) FROM texts WHERE LENGTH(text) < :short_len AND '
+                'INSTR(text, :keyword) > 0'
+            )
+            values = {'keyword': keyword, 'short_len': config.server.short_length}
             count = await db.fetch_one(query, values)
             return count[0]

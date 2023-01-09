@@ -6,7 +6,7 @@ class ServerConfig(BaseModel):
     port: int
 
     # Minimum text length when getting from the database.
-    min_text_length: int
+    short_length: int
 
     # Server host.
     host: str

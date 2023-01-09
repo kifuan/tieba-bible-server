@@ -3,8 +3,7 @@
     "forum_name": "复制粘贴",
     "start_page": 1,
     "end_page": 1,
-    "max_post_pages": 1,
-    "merge_only": false
+    "max_post_pages": 1
   },
   "server": {
     "port": 8003,

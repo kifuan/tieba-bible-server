@@ -28,9 +28,6 @@ class SpiderConfig(BaseModel):
     # The forum name to fetch.
     forum_name: str
 
-    # Whether to merge the threads locally.
-    merge_only: bool
-
 
 class AnalyzerConfig(BaseModel):
     # The limit to show.

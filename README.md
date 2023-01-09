@@ -61,7 +61,6 @@ python migrate.py
    + `start_page`：默认为 `1`，表示从哪页开始爬取，包含这页。
    + `end_page`：默认为 `5`，表示从哪页结束，包含这页。
    + `max_post_pages`：默认为 `10`，表示每个帖子最多爬多少页，实际情况爬取可能比它少，不会比它多，因为这个帖可能没那么多回复。
-   + `merge_only`：默认为 `false`，表示是否只合并本地爬取到的文件，如果是 `true` 则不会爬取新的帖子，只会合并本地数据，是作者拿来 debug 用的。
 
    首次运行会产生 `aiotieba.toml`，请参考他们的[官方文档](https://v-8.top/tutorial/quickstart/#_4)来进行配置 `aiotieba.toml`。
 

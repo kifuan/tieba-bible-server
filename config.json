@@ -2,8 +2,8 @@
   "spider": {
     "forum_name": "复制粘贴",
     "start_page": 1,
-    "end_page": 1,
-    "max_post_pages": 1
+    "end_page": 5,
+    "max_post_pages": 10
   },
   "server": {
     "port": 8003,

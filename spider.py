@@ -11,7 +11,7 @@ from database import Database
 
 DATA_DIR = Path(__file__).parent / 'data'
 
-REPLY_PREFIX_REGEX = re.compile(r'回复.+[:：]\s*')
+REPLY_PREFIX_REGEX = re.compile(r'^(回复.+[:：]\s*|@.+\s+)')
 
 
 def process_text(text: str) -> str:

@@ -95,7 +95,7 @@ class Database:
         """
 
         async with self._db as db:
-            # The short_len is read from server configurations, which won't cause SQL injection.
+            # The length is read from server configurations, which won't cause SQL injection.
             query = (
                 f'SELECT text FROM texts WHERE LENGTH(text) < {config.server.short_length} '
                 'AND INSTR (text, :keyword) > 0 ORDER BY RANDOM() LIMIT 1'
@@ -118,7 +118,7 @@ class Database:
         """
 
         async with self._db as db:
-            # The short_len is read from server configurations, which won't cause SQL injection.
+            # The length is read from server configurations, which won't cause SQL injection.
             query = (
                 f'SELECT COUNT(*) FROM texts WHERE LENGTH(text) < {config.server.short_length} '
                 'AND INSTR(text, :keyword) > 0'

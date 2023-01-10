@@ -1,12 +1,8 @@
 import uvicorn
-import logging
 
 from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-
-from pydantic import BaseModel
-from typing import Union
 
 from config import config
 from database import Database
@@ -18,9 +14,6 @@ app.add_middleware(
     allowed_hosts=config.server.allowed_hosts
 )
 
-# Use uvicorn logger.
-logger = logging.getLogger('uvicorn')
-
 
 async def get_db() -> Database:
     """
@@ -28,10 +21,6 @@ async def get_db() -> Database:
     :return: the database instance.
     """
     return await Database.get_instance()
-
-
-class BodyAddCustomTexts(BaseModel):
-    text: Union[str, list[str]]
 
 
 @app.get('/text')

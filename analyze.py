@@ -37,11 +37,11 @@ def cut_text(text: str) -> Generator[str, None, None]:
 
 
 async def main() -> None:
-    database = await Database.get_instance()
+    db = await Database.get_instance()
 
     min_len = config.analyzer.min_word_length
     data = Counter([
-        word async for text in database
+        word async for text in db
         for word in cut_text(text)
         if word not in STOPWORDS and len(word) >= min_len
     ])

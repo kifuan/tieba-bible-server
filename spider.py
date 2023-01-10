@@ -32,8 +32,8 @@ async def get_thread_texts(client: aiotieba.Client, tid: int) -> AsyncGenerator[
     :return: the texts of given thread.
     """
 
-    database = await Database.get_instance()
-    if await database.check_if_visited_thread(tid):
+    db = await Database.get_instance()
+    if await db.check_if_visited_thread(tid):
         aiotieba.LOG.warning(f'The thread {tid} is visited. Skipping.')
         return
 
@@ -61,15 +61,15 @@ async def save_page(client: aiotieba.Client, name: str, pn: int) -> None:
     """
 
     aiotieba.LOG.info(f'Getting page {pn}.')
-    database = await Database.get_instance()
+    db = await Database.get_instance()
     threads = await client.get_threads(name, pn=pn, sort=1)
 
     for thread in threads:
-        await database.add_texts([
+        await db.add_texts([
             text async for text in get_thread_texts(client, thread.tid)
         ])
 
-    await database.add_visited_threads(thread.tid for thread in threads)
+    await db.add_visited_threads(thread.tid for thread in threads)
 
 
 async def save_pages(name: str, start_page: int, end_page: int) -> None:

@@ -19,7 +19,7 @@ async def migrate() -> None:
         print('You don\'t need to migrate.')
         return
 
-    database = await Database.get_instance()
+    db = await Database.get_instance()
     files = [file for file in THREADS_DIR.iterdir() if file.suffix == '.json']
 
     if not files:
@@ -28,13 +28,13 @@ async def migrate() -> None:
         print('Removed it directly.')
         return
 
-    await database.add_texts(
+    await db.add_texts(
         process_text(text)
         for file in files
         for text in ujson.loads(file.read_text('utf8'))
     )
 
-    await database.add_visited_threads(
+    await db.add_visited_threads(
         int(file.stem) for file in files
     )
 

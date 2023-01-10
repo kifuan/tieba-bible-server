@@ -1,6 +1,6 @@
 import databases
 
-from typing import Iterable, Optional, AsyncGenerator, Union
+from typing import Iterable, Optional, AsyncGenerator
 from config import config
 
 

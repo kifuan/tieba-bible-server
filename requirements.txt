@@ -4,5 +4,6 @@ uvicorn
 fastapi
 pydantic
 aiotieba
+aiosqlite
+databases
 matplotlib
-databases[aiosqlite]

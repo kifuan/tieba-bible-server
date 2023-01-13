@@ -54,8 +54,7 @@ async def main() -> None:
     if not items:
         raise ValueError('cannot get any data')
 
-    words, counts = map(list, zip(*items))
-    plt.bar(words, counts)
+    plt.bar(*zip(*items))
     plt.title(f'Top {config.analyzer.limit}')
     plt.show()
 

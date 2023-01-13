@@ -32,8 +32,7 @@ def cut_text(text: str) -> Generator[str, None, None]:
     if config.analyzer.once_per_file:
         words = set(words)
 
-    for word in words:
-        yield word
+    yield from words
 
 
 async def main() -> None:

@@ -20,6 +20,7 @@ async def get_db() -> Database:
     It is used for dependency injection.
     :return: the database instance.
     """
+
     return await Database.get_instance()
 
 
